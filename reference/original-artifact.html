@@ -1,0 +1,600 @@
+<title>소금은 어디에서 올까</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#FAF8F4; --surface:#FFFFFF; --surface-2:#F3EFE8; --line:#E4DED3;
+  --ink:#1F1A17; --ink-2:#5B534B; --ink-3:#8C837A;
+  --accent:#E8702A; --accent-ink:#FFFFFF; --accent-soft:#FBE7DA;
+  --data:#1F7A8C; --data-soft:#DDEEF2;
+  --good:#2E8B57; --good-soft:#DFF2E6; --warn:#B8860B; --warn-soft:#F7EFD2; --bad:#C0392B; --bad-soft:#F8DCD8;
+  --shadow:0 1px 2px rgba(31,26,23,.06),0 8px 24px rgba(31,26,23,.06);
+  --ui:"Noto Sans KR",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --read:"Gowun Dodum","Noto Sans KR","Apple SD Gothic Neo",sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#17140F; --surface:#221E18; --surface-2:#2B2620; --line:#3A342C;
+    --ink:#F1ECE4; --ink-2:#C3BBAF; --ink-3:#8C837A;
+    --accent:#F08A4A; --accent-ink:#1F1A17; --accent-soft:#3D2A1E;
+    --data:#5FB3C4; --data-soft:#1E3238;
+    --good:#5CC48A; --good-soft:#1E3327; --warn:#E0B44A; --warn-soft:#3A3116; --bad:#E5705F; --bad-soft:#3E211D;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#17140F; --surface:#221E18; --surface-2:#2B2620; --line:#3A342C;
+  --ink:#F1ECE4; --ink-2:#C3BBAF; --ink-3:#8C837A;
+  --accent:#F08A4A; --accent-ink:#1F1A17; --accent-soft:#3D2A1E;
+  --data:#5FB3C4; --data-soft:#1E3238;
+  --good:#5CC48A; --good-soft:#1E3327; --warn:#E0B44A; --warn-soft:#3A3116; --bad:#E5705F; --bad-soft:#3E211D;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ui);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.app{max-width:760px;margin:0 auto;padding-inline:16px;padding-block:0 96px}
+h1,h2,h3{margin:0;text-wrap:balance;line-height:1.3}
+p{margin:0}
+button{font:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--data);outline-offset:2px}
+input,textarea,select{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+textarea{width:100%;resize:vertical;font-family:var(--read);font-size:17px;line-height:1.8}
+[hidden]{display:none!important}
+
+/* header + rail */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:14px 10px;border-bottom:1px solid var(--line)}
+.eyebrow{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.eyebrow b{color:var(--accent);font-weight:700;letter-spacing:0}
+.top h1{font-family:var(--read);font-size:22px;margin-top:2px}
+.rail{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:12px}
+.rail button{border:0;background:var(--surface-2);color:var(--ink-3);border-radius:8px;padding:8px 4px;font-size:12px;font-weight:500;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.2}
+.rail button .n{font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
+.rail button.cur{background:var(--accent);color:var(--accent-ink)}
+.rail button.done{background:var(--good-soft);color:var(--good)}
+.rail button:disabled{cursor:default;opacity:.75}
+
+/* sections */
+section.stage{padding-block:22px 8px}
+.stage-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.stage-head h2{font-family:var(--read);font-size:20px}
+.stage-head .goal{font-size:13px;color:var(--ink-2)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:var(--shadow)}
+.stack{display:flex;flex-direction:column;gap:14px}
+.muted{color:var(--ink-2);font-size:13px}
+.tiny{color:var(--ink-3);font-size:12px}
+.chip{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;padding:2px 8px;border-radius:999px;background:var(--surface-2);color:var(--ink-2)}
+.chip.pos-명사{background:var(--accent-soft);color:var(--accent)}
+.chip.pos-동사{background:var(--data-soft);color:var(--data)}
+.chip.pos-부사{background:var(--good-soft);color:var(--good)}
+.chip.fact{background:var(--accent-soft);color:var(--accent)}
+.chip.infer{background:var(--data-soft);color:var(--data)}
+.chip.good{background:var(--good-soft);color:var(--good)}
+.chip.warn{background:var(--warn-soft);color:var(--warn)}
+.chip.bad{background:var(--bad-soft);color:var(--bad)}
+
+/* buttons */
+.btn{border:0;border-radius:10px;padding:12px 18px;font-weight:700;font-size:15px;background:var(--accent);color:var(--accent-ink)}
+.btn.secondary{background:var(--surface-2);color:var(--ink)}
+.btn.ghost{background:transparent;color:var(--ink-2);border:1px solid var(--line)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.actionbar{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));z-index:6}
+.actionbar .in{max-width:760px;margin:0 auto;display:flex;gap:10px;justify-content:space-between;align-items:center}
+.actionbar .status{font-size:13px;color:var(--ink-2);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* vocab */
+.vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.vcard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.vcard .w{font-family:var(--read);font-size:20px;font-weight:700;display:flex;align-items:center;gap:8px}
+.vcard .d{font-size:11px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.vcard .m{font-size:14px;color:var(--ink-2)}
+.vcard .ex{font-family:var(--read);font-size:14px;background:var(--surface-2);border-radius:8px;padding:8px 10px;line-height:1.7}
+.vcard .ex mark{background:var(--accent-soft);color:var(--accent);padding:0 2px;border-radius:3px;font-weight:700}
+.compose{display:grid;gap:10px}
+.compose label{font-weight:700;display:flex;align-items:center;gap:8px}
+.compose .fb{font-size:13px;padding:8px 10px;border-radius:8px;background:var(--surface-2)}
+
+/* quiz */
+.q{display:flex;flex-direction:column;gap:8px;padding:14px 0;border-top:1px solid var(--line)}
+.q:first-child{border-top:0;padding-top:0}
+.q .stem{font-weight:700;display:flex;gap:8px;align-items:flex-start}
+.q .stem .num{color:var(--ink-3);font-variant-numeric:tabular-nums;min-width:22px}
+.opts{display:grid;gap:6px}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);cursor:pointer}
+.opt:hover{border-color:var(--ink-3)}
+.opt.sel{border-color:var(--accent);background:var(--accent-soft)}
+.opt.right{border-color:var(--good);background:var(--good-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt input{margin-top:4px}
+.ev{font-size:12px;color:var(--data);background:var(--data-soft);border-radius:6px;padding:4px 8px;display:inline-block}
+
+/* concept */
+.concept{font-family:var(--read);font-size:18px;line-height:2;padding:18px 20px}
+.concept .kw{font-weight:700;color:var(--accent);border-bottom:2px solid var(--accent)}
+.blank{display:inline-flex;gap:4px;align-items:center;vertical-align:baseline;margin:0 2px}
+.blank input{width:7.5em;font-family:var(--read);font-size:17px;padding:2px 8px;text-align:center;border-bottom:2px solid var(--accent);border-radius:6px}
+.blank select{font-size:12px;padding:2px 4px;border-radius:6px}
+.blank.right input{border-color:var(--good);background:var(--good-soft)}
+.blank.wrong input{border-color:var(--bad);background:var(--bad-soft)}
+.blank.similar input{border-color:var(--warn);background:var(--warn-soft)}
+
+/* passage */
+.passage{font-family:var(--read);font-size:18px;line-height:2;padding:22px 24px}
+.passage h3{font-size:22px;margin-bottom:12px;text-align:center}
+.para{margin-bottom:16px;position:relative;padding-left:10px;border-left:3px solid transparent;border-radius:3px}
+.para:hover{border-left-color:var(--data-soft)}
+.para .role{position:absolute;left:-2px;top:-14px;font-size:10px;color:var(--ink-3);font-family:var(--ui);letter-spacing:.04em}
+.sent{border-radius:4px;padding:1px 2px;transition:background .15s}
+.sel-mode .sent{cursor:pointer}
+.sel-mode .sent:hover{background:var(--surface-2)}
+.sent.picked{background:var(--accent-soft);box-shadow:inset 0 -2px 0 var(--accent)}
+.sent.key{background:var(--data-soft);box-shadow:inset 0 -2px 0 var(--data)}
+.sent.key.picked{background:var(--good-soft);box-shadow:inset 0 -2px 0 var(--good)}
+.sent.picked:not(.key){background:var(--bad-soft);box-shadow:inset 0 -2px 0 var(--bad)}
+.gaze{display:grid;gap:8px}
+.gaze .row{display:grid;grid-template-columns:72px 1fr 64px;gap:10px;align-items:center;font-size:13px}
+.gaze .bar{height:12px;background:var(--surface-2);border-radius:6px;overflow:hidden}
+.gaze .bar i{display:block;height:100%;background:var(--data);border-radius:6px}
+.gaze .row.hot .bar i{background:var(--bad)}
+.gaze .v{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink-2)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+.kpi{background:var(--surface-2);border-radius:10px;padding:10px 12px}
+.kpi .l{font-size:11px;color:var(--ink-3);letter-spacing:.04em}
+.kpi .v{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.2}
+.kpi .s{font-size:11px;color:var(--ink-2)}
+
+/* outline */
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.schip{font-family:var(--read);font-size:14px;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);cursor:pointer;text-align:left;line-height:1.5}
+.schip.sel{border-color:var(--accent);background:var(--accent-soft)}
+.schip.used{opacity:.4;cursor:default}
+.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media (max-width:560px){.slots{grid-template-columns:1fr}}
+.slot{border:2px dashed var(--line);border-radius:10px;padding:10px;min-height:96px;display:flex;flex-direction:column;gap:6px;cursor:pointer}
+.slot.target{border-color:var(--accent);background:var(--accent-soft)}
+.slot h4{margin:0;font-size:13px;display:flex;justify-content:space-between;align-items:center}
+.slot .hint{font-size:11px;color:var(--ink-3)}
+.slot .item{font-family:var(--read);font-size:13px;background:var(--surface-2);border-radius:6px;padding:4px 8px;display:flex;justify-content:space-between;gap:6px;line-height:1.5}
+.slot .item.ok{background:var(--good-soft)}
+.slot .item.no{background:var(--bad-soft)}
+.slot .item button{border:0;background:transparent;color:var(--ink-3);padding:0 2px}
+.meter{display:flex;align-items:center;gap:10px;font-size:13px}
+.meter .bar{flex:1;height:8px;background:var(--surface-2);border-radius:4px;overflow:hidden}
+.meter .bar i{display:block;height:100%;background:var(--accent)}
+.kwlist{display:flex;flex-wrap:wrap;gap:6px}
+.kw{font-size:12px;padding:3px 8px;border-radius:999px;background:var(--surface-2);color:var(--ink-3)}
+.kw.on{background:var(--good-soft);color:var(--good);font-weight:700}
+.corr{display:grid;gap:8px}
+.corr .c{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:grid;gap:4px;font-size:14px}
+.corr .c .o{color:var(--bad);text-decoration:line-through}
+.corr .c .s{color:var(--good);font-weight:700}
+.corr .c .r{font-size:12px;color:var(--ink-2)}
+.scores{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media (max-width:480px){.scores{grid-template-columns:1fr}}
+.score{background:var(--surface-2);border-radius:10px;padding:10px 12px}
+.score .l{font-size:12px;color:var(--ink-3)}
+.score .v{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.score .n{font-size:12px;color:var(--ink-2)}
+.thinking{display:flex;gap:10px;align-items:center;color:var(--ink-2);font-size:14px}
+.thinking i{width:10px;height:10px;border-radius:50%;background:var(--accent);animation:pulse 1s infinite alternate}
+@keyframes pulse{to{opacity:.2}}
+@media (prefers-reduced-motion:reduce){.thinking i{animation:none}}
+
+/* report */
+.areas{display:grid;gap:12px}
+.area{border-top:4px solid var(--accent)}
+.area.b{border-top-color:var(--data)}
+.area.c{border-top-color:var(--good)}
+.area h3{font-size:15px;margin-bottom:8px;display:flex;justify-content:space-between}
+.mrow{display:grid;grid-template-columns:1fr auto;gap:8px;padding:6px 0;border-top:1px dashed var(--line);font-size:14px;align-items:center}
+.mrow:first-of-type{border-top:0}
+.mrow .v{font-weight:700;font-variant-numeric:tabular-nums}
+.rx{display:grid;gap:8px}
+.rx .r{display:grid;grid-template-columns:auto 1fr;gap:10px;font-size:14px;padding:8px 10px;background:var(--surface-2);border-radius:8px}
+.rx .r b{color:var(--accent)}
+.note{font-size:12px;color:var(--ink-3);border-left:3px solid var(--line);padding-left:10px}
+</style>
+
+<div class="app">
+  <header class="top">
+    <div class="eyebrow"><b>리드AI 데모</b><span>3학년 2학기 국어</span><span>1단원 경험과 관련지으며 이해해요</span><span>소단원 2 중요한 내용 간추리기</span><span>2단계 · 교과서 수준</span></div>
+    <h1>소금은 어디에서 올까</h1>
+    <nav class="rail" id="rail" aria-label="학습 단계">
+      <button data-s="1"><span class="n">①</span>어휘</button>
+      <button data-s="2"><span class="n">②</span>개념·인출</button>
+      <button data-s="3"><span class="n">③</span>읽기·진단</button>
+      <button data-s="4"><span class="n">④</span>구조화·글쓰기</button>
+      <button data-s="5"><span class="n">▣</span>리포트</button>
+    </nav>
+  </header>
+
+  <!-- ① 어휘 -->
+  <section class="stage" id="s1">
+    <div class="stage-head"><h2>① 어휘 학습</h2><div class="goal">지문에 나오는 낱말 10개 · 명사 6 · 동사 3 · 부사 1</div></div>
+    <div class="stack">
+      <div class="vgrid" id="vgrid"></div>
+      <div class="card">
+        <h3 style="font-size:15px;margin-bottom:10px">짧은 글짓기</h3>
+        <p class="muted" style="margin-bottom:10px">낱말의 뜻이 드러나게 한 문장을 지어 보세요.</p>
+        <div class="compose" id="compose"></div>
+      </div>
+      <div class="card">
+        <h3 style="font-size:15px;margin-bottom:10px">활용 문제</h3>
+        <div id="vquiz"></div>
+      </div>
+      <div class="card" hidden id="s1result"></div>
+    </div>
+  </section>
+
+  <!-- ② 개념 -->
+  <section class="stage" hidden id="s2">
+    <div class="stage-head"><h2>② 개념 이해 · 빈칸 추론</h2><div class="goal">중심 문장과 뒷받침 문장 · 소금이 만들어지는 과정</div></div>
+    <div class="stack">
+      <div id="c-read">
+        <p class="muted" style="margin-bottom:10px">한 번만 읽을 수 있어요. 다 읽으면 화면이 바뀌고, 중요한 낱말이 빈칸이 됩니다.</p>
+        <div class="card concept" id="ctext"></div>
+      </div>
+      <div hidden id="c-fill">
+        <p class="muted" style="margin-bottom:10px">기억을 떠올려 빈칸을 채우고, 각 빈칸이 얼마나 확실한지 표시하세요.</p>
+        <div class="card concept" id="cblanks"></div>
+      </div>
+      <div class="card" hidden id="s2result"></div>
+    </div>
+  </section>
+
+  <!-- ③ 읽기 -->
+  <section class="stage" hidden id="s3">
+    <div class="stage-head"><h2>③ 지문 읽기 · 정밀 진단</h2><div class="goal">읽기 → 핵심 문장 찾기 → 사실 5 · 추론 2</div></div>
+    <div class="stack">
+      <p class="muted" id="r-guide">처음부터 끝까지 읽으세요. 읽는 동안 문단별 머문 시간을 기록합니다. <span class="tiny">(데모: 시선 추적 대신 포인터 체류로 측정)</span></p>
+      <div class="card passage" id="passage"></div>
+      <div class="card" hidden id="gaze"></div>
+      <div class="card" hidden id="rquiz"></div>
+      <div class="card" hidden id="s3result"></div>
+    </div>
+  </section>
+
+  <!-- ④ 글쓰기 -->
+  <section class="stage" hidden id="s4">
+    <div class="stage-head"><h2>④ 구조화 · 글쓰기</h2><div class="goal">처음-중간-끝 뼈대 → 간추려 쓰기 → AI 첨삭</div></div>
+    <div class="stack">
+      <div id="o-build">
+        <p class="muted" style="margin-bottom:10px">문장을 고른 다음, 들어갈 자리를 누르세요. 각 자리에 중심 문장만 넣습니다.</p>
+        <div class="card stack">
+          <div class="chips" id="schips"></div>
+          <div class="slots" id="slots"></div>
+          <div id="o-score" hidden></div>
+        </div>
+      </div>
+      <div class="stack" hidden id="o-write">
+        <div class="card stack">
+          <div><h3 style="font-size:15px">간추려 쓰기</h3><p class="muted">뼈대를 보면서 150자 안팎으로 간추려 쓰세요. 낱말 10개와 개념 낱말을 넣으면 더 좋아요.</p></div>
+          <div class="slots" id="slots-ref"></div>
+          <textarea id="essay" rows="6" placeholder="여기에 간추려 쓰세요."></textarea>
+          <div class="meter"><span id="cc">0자</span><div class="bar"><i id="kwbar" style="width:0%"></i></div><span id="kwpct">낱말 0/15</span></div>
+          <div class="kwlist" id="kwlist"></div>
+        </div>
+        <div class="card" hidden id="feedback"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 리포트 -->
+  <section class="stage" hidden id="s5">
+    <div class="stage-head"><h2>회차 리포트</h2><div class="goal">인지·문해 / 행동·습관 / 표현·사고</div></div>
+    <div class="stack" id="report"></div>
+  </section>
+</div>
+
+<div class="actionbar"><div class="in"><span class="status" id="status">낱말 카드를 읽고, 글짓기와 문제를 풀어 보세요.</span><div style="display:flex;gap:8px"><button class="btn ghost" hidden id="btn-reset">처음부터</button><button class="btn" id="btn-main">채점하기</button></div></div></div>
+
+<script>
+const PKG = {
+  vocab:[
+    {word:"방법",pos:"명사",d:0,src:"교과서 908·기존풀",meaning:"어떤 일을 해 나가거나 목적을 이루기 위하여 취하는 수단이나 방식",s:16},
+    {word:"사용",pos:"명사",d:2,src:"교과서 908(3학년)·기존풀",meaning:"일정한 목적이나 기능에 맞게 씀",s:1},
+    {word:"재료",pos:"명사",d:2,src:"기존풀",meaning:"무언가를 만드는 데 필요한 것",s:14},
+    {word:"순서",pos:"명사",d:1,src:"기존풀",meaning:"정하여진 기준에서 말하는 앞뒤의 차례",s:13},
+    {word:"역할",pos:"명사",d:2,src:"기존풀",meaning:"자기가 마땅히 하여야 할 맡은 바 일",s:15},
+    {word:"생산",pos:"명사",d:3,src:"교과서 908·기존풀",meaning:"생활하는 데 필요한 여러 물건을 만들어 냄",s:16},
+    {word:"녹다",pos:"동사",d:0,src:"기존풀",meaning:"고체가 액체로 변하다",s:4},
+    {word:"굳다",pos:"동사",d:2,src:"기존풀",meaning:"부드러운 물질이 단단하게 변하다",s:7},
+    {word:"증발하다",pos:"동사",d:3,src:"기존풀",meaning:"액체 상태에서 기체 상태로 변하다",s:7},
+    {word:"대부분",pos:"부사",d:1,src:"교과서 908·기존풀",meaning:"절반이 훨씬 넘어 거의 전부에 가까운 정도로",s:0}
+  ],
+  compose:["굳다","역할"],
+  paragraphs:[
+    {role:"도입",s:["우리가 먹는 음식에는 대부분 소금이 들어 있어요.","국을 끓일 때도, 김치를 담글 때도 소금을 사용해요.","그런데 이 소금은 어디에서 오는 걸까요?"]},
+    {role:"전개 · 바다",s:["소금은 대부분 바닷물에서 얻어요.","바닷물에는 소금이 녹아 있어요.","사람들은 바닷가에 ‘염전’이라는 넓은 밭을 만들어요.","그리고 염전에 바닷물을 끌어와 햇볕에 말려요.","물이 천천히 증발하면, 하얀 소금만 남아 굳어요.","이렇게 만든 소금을 ‘천일염’이라고 해요."]},
+    {role:"전개 · 땅속",s:["소금은 땅속에서도 얻을 수 있어요.","아주 오래전에 바다였던 곳이 땅으로 변하면서 소금이 두껍게 쌓인 거예요.","이런 곳을 ‘암염 광산’이라고 해요.","사람들은 광산에서 돌처럼 굳은 소금을 캐내요."]},
+    {role:"정리",s:["바다에서 얻든 땅에서 얻든, 소금을 만드는 순서는 비슷해요.","소금이 있는 재료를 모으고, 물기를 없애고, 남은 소금을 거두는 거예요.","소금은 음식의 맛을 내는 역할뿐 아니라 음식을 오래 보관하는 데도 사용돼요.","그래서 옛날부터 사람들은 여러 방법으로 소금을 생산해 왔답니다."]}
+  ],
+  key:[0,3,9,13],
+  concept:{
+    parts:["글을 읽고 중요한 내용을 간추리려면 먼저 각 문단에서 ",0," 을 찾아요. 중심 문장은 그 문단에서 가장 중요한 내용을 담은 문장이에요. 중심 문장을 자세히 설명하거나 예를 드는 문장은 ",1," 이라고 해요. 간추릴 때는 중심 문장은 남기고, 뒷받침 문장은 줄이거나 빼요. 「소금은 어디에서 올까」에서 소금은 ",2," 과 땅속에서 얻어요. ",3," 에서는 바닷물의 물기를 햇볕에 ",4," 시켜 소금을 얻고, 땅속에서는 굳은 소금을 캐내요."],
+    blanks:[
+      {k:"중심 문장",ok:["중심문장"]},
+      {k:"뒷받침 문장",ok:["뒷받침문장","뒤받침문장"]},
+      {k:"바닷물",ok:["바다물","바다"]},
+      {k:"염전",ok:[]},
+      {k:"증발",ok:["증발시켜","증발하게"]}
+    ]
+  },
+  questions:[
+    {t:"사실적",q:"우리가 먹는 음식에 대부분 들어 있는 것은 무엇인가요?",o:["설탕","소금","식초","기름","후추"],a:1,ev:[0]},
+    {t:"사실적",q:"사람들이 바닷가에 만드는 넓은 밭을 무엇이라고 하나요?",o:["논","광산","염전","텃밭","갯벌"],a:2,ev:[5]},
+    {t:"사실적",q:"염전에서 바닷물의 물을 없애는 방법은 무엇인가요?",o:["불에 끓인다","햇볕에 말린다","얼음으로 얼린다","기계로 짠다","땅에 묻는다"],a:1,ev:[6,7]},
+    {t:"사실적",q:"땅속에서 굳은 소금을 캐내는 곳을 무엇이라고 하나요?",o:["염전","동굴","암염 광산","우물","공장"],a:2,ev:[11,12]},
+    {t:"사실적",q:"이 글에서 말한 소금의 역할 두 가지는 무엇인가요?",o:["맛을 내고 색을 낸다","맛을 내고 음식을 오래 보관한다","음식을 부드럽게 하고 차갑게 한다","향을 내고 달게 한다","음식을 익히고 식힌다"],a:1,ev:[15]},
+    {t:"추론적",q:"염전을 비가 많이 오는 곳보다 햇볕이 강한 곳에 만드는 까닭은 무엇일까요?",o:["소금이 더 하얗게 되기 때문에","물이 잘 증발해야 소금이 남기 때문에","바닷물이 더 짜기 때문에","사람들이 더 많이 살기 때문에","비가 오면 소금이 녹아 사라지기 때문에"],a:1,ev:[6,7]},
+    {t:"추론적",q:"땅속에 소금이 두껍게 쌓여 있는 것으로 보아 알 수 있는 것은 무엇일까요?",o:["그곳은 지금도 바다이다","그곳은 아주 오래전에 바다였다","그곳에는 염전이 있다","그곳은 항상 햇볕이 강하다","그곳 사람들은 소금을 많이 먹는다"],a:1,ev:[10]}
+  ],
+  outline:{
+    slots:[{label:"처음",hint:"소금은 무엇에 쓰이고, 어디에서 올까?",s:[0]},{label:"중간",hint:"소금을 얻는 두 곳",s:[3,9]},{label:"끝",hint:"만드는 순서와 소금의 역할",s:[13,15]}],
+    ref:"우리가 먹는 음식에는 소금이 많이 쓰인다. 소금은 바닷물을 염전에서 햇볕에 말려 얻거나, 땅속 광산에서 굳은 소금을 캐내어 얻는다. 소금은 음식의 맛을 내고 오래 보관하는 데 쓰인다.",
+    guide:150
+  },
+  vquiz:[
+    {k:"뜻 고르기",q:"‘증발하다’의 뜻으로 알맞은 것은?",o:["단단하게 변하다","액체가 기체로 변하다","고체가 액체로 변하다","한데 모이다","넓게 퍼지다"],a:1},
+    {k:"문맥 빈칸",q:"바닷물을 햇볕에 말리면 물이 (    ) 소금만 남아요.",o:["녹아서","굳어서","증발하고","쌓여서","모여서"],a:2},
+    {k:"문맥 빈칸",q:"소금은 음식을 오래 보관하는 (    )을 해요.",o:["재료","순서","방법","역할","생산"],a:3},
+    {k:"비슷한 말",q:"‘방법’과 뜻이 가장 비슷한 낱말은?",o:["방식","재료","순서","역할","결과"],a:0},
+    {k:"잘못 쓴 문장",q:"낱말을 잘못 사용한 문장은?",o:["소금은 바닷물에 녹아 있어요.","얼음이 햇볕에 굳었어요.","김치를 담글 때 소금을 사용해요.","순서대로 재료를 모아요.","옛날부터 소금을 생산해 왔어요."],a:1}
+  ]
+};
+const SENT = PKG.paragraphs.flatMap(p=>p.s);
+const PARA_OF = PKG.paragraphs.flatMap((p,i)=>p.s.map(()=>i));
+const TOTAL_CHARS = SENT.join("").length;
+const stem = w => w.endsWith("하다") ? w.slice(0,-2) : (w.endsWith("다") ? w.slice(0,-1) : w);
+const KEYWORDS = [...PKG.vocab.map(v=>v.word), ...PKG.concept.blanks.map(b=>b.k)];
+
+// ---------- state ----------
+const R = { stage:1, done:{}, v:{quiz:null,compose:null}, c:null, g:null, r:null, o:null, w:null };
+let samplePromise = (window.claude && window.claude.use) ? window.claude.use("sample").catch(()=>null) : Promise.resolve(null);
+let sampleFn = null; samplePromise.then(f=>{ sampleFn = f; });
+const $ = id => document.getElementById(id);
+const el = (t,c,h)=>{ const e=document.createElement(t); if(c) e.className=c; if(h!=null) e.innerHTML=h; return e; };
+const pct = (a,b)=> b? Math.round(a/b*100):0;
+const status = t => { $("status").textContent = t; };
+const mainBtn = (label, fn, disabled=false) => { const b=$("btn-main"); b.textContent=label; b.onclick=fn; b.disabled=disabled; b.hidden=false; };
+function errCopy(e){ const m={not_granted:"AI 기능 사용이 허용되지 않아 규칙 기반 결과만 보여 줍니다.",rate_limited:"요청이 많아요. 잠시 후 다시 눌러 주세요.",refused:"이 내용은 AI가 답하지 않았어요. 글을 조금 바꿔 보세요.",invalid_json:"AI 답을 읽지 못했어요. 다시 눌러 주세요.",cancelled:"멈췄어요.",session_expired:"다시 로그인이 필요해요."}; return m[e&&e.code]||"AI 응답에 문제가 있어 규칙 기반 결과만 보여 줍니다."; }
+
+// ---------- rail ----------
+function setStage(n){
+  R.stage=n;
+  for(let i=1;i<=5;i++){ $("s"+i).hidden = (i!==n); }
+  document.querySelectorAll("#rail button").forEach(b=>{ const s=+b.dataset.s; b.classList.toggle("cur",s===n); b.classList.toggle("done",!!R.done[s]&&s!==n); b.disabled = !(s===n || R.done[s] || R.done[s-1]); });
+  window.scrollTo({top:0});
+  $("btn-reset").hidden = n===1 && !R.done[1];
+  ({1:initS1,2:initS2,3:initS3,4:initS4,5:initS5})[n]();
+}
+document.querySelectorAll("#rail button").forEach(b=>b.onclick=()=>setStage(+b.dataset.s));
+$("btn-reset").onclick=()=>location.reload();
+
+// ---------- ① 어휘 ----------
+function highlight(text, w){ const s=stem(w); const i=text.indexOf(s); if(i<0) return text; let j=i+s.length; while(j<text.length && /[가-힣]/.test(text[j])) j++; return text.slice(0,i)+"<mark>"+text.slice(i,j)+"</mark>"+text.slice(j); }
+function initS1(){
+  if($("vgrid").children.length) return;
+  PKG.vocab.forEach(v=>{
+    const c=el("div","vcard");
+    c.innerHTML=`<div class="w">${v.word}<span class="chip pos-${v.pos}">${v.pos}</span></div><div class="d">난이도 d${v.d} · ${v.src}</div><div class="m">${v.meaning}</div><div class="ex">${highlight(SENT[v.s],v.word)}</div>`;
+    $("vgrid").append(c);
+  });
+  PKG.compose.forEach((w,i)=>{
+    const v=PKG.vocab.find(x=>x.word===w);
+    const d=el("div"); d.innerHTML=`<label for="comp${i}">${w} <span class="chip pos-${v.pos}">${v.pos}</span><span class="tiny">${v.meaning}</span></label><input id="comp${i}" placeholder="‘${w}’를 넣어 한 문장" style="width:100%"><div class="fb" hidden id="compfb${i}"></div>`;
+    $("compose").append(d);
+  });
+  PKG.vquiz.forEach((q,i)=>$("vquiz").append(renderQ(q,i,"vq")));
+  mainBtn("채점하기", gradeS1);
+  status("낱말 카드를 읽고, 글짓기와 문제를 풀어 보세요.");
+}
+function renderQ(q,i,pfx){
+  const d=el("div","q");
+  d.innerHTML=`<div class="stem"><span class="num">${i+1}.</span><span>${q.t?`<span class="chip ${q.t==="사실적"?"fact":"infer"}">${q.t} 이해</span> `:""}${q.k?`<span class="chip">${q.k}</span> `:""}${q.q}</span></div>`;
+  const o=el("div","opts");
+  q.o.forEach((t,j)=>{ const id=`${pfx}${i}_${j}`; const l=el("label","opt"); l.innerHTML=`<input type="radio" name="${pfx}${i}" id="${id}" value="${j}"><span>${t}</span>`; l.onclick=()=>{ o.querySelectorAll(".opt").forEach(x=>x.classList.remove("sel")); l.classList.add("sel"); }; o.append(l); });
+  d.append(o); return d;
+}
+function readAnswers(pfx,n){ return Array.from({length:n},(_,i)=>{ const r=document.querySelector(`input[name="${pfx}${i}"]:checked`); return r?+r.value:null; }); }
+function markQ(pfx,qs,ans){ qs.forEach((q,i)=>{ document.querySelectorAll(`input[name="${pfx}${i}"]`).forEach(inp=>{ const l=inp.closest(".opt"); inp.disabled=true; if(+inp.value===q.a) l.classList.add("right"); else if(ans[i]===+inp.value) l.classList.add("wrong"); }); if(q.ev){ const e=el("div"); e.innerHTML=`<span class="ev">근거: 문장 ${q.ev.map(x=>x+1).join(", ")} — “${SENT[q.ev[0]]}”</span>`; document.querySelector(`input[name="${pfx}${i}"]`).closest(".q").append(e);} }); }
+async function gradeS1(){
+  const ans=readAnswers("vq",5); if(ans.includes(null)){ status("문제를 모두 풀어 주세요."); return; }
+  const sents=PKG.compose.map((w,i)=>$("comp"+i).value.trim());
+  if(sents.some(s=>!s)){ status("글짓기 두 문장을 모두 써 주세요."); return; }
+  $("btn-main").disabled=true;
+  const correct=ans.filter((a,i)=>a===PKG.vquiz[i].a).length;
+  markQ("vq",PKG.vquiz,ans);
+  // 글짓기 채점: 규칙(포함 여부) + AI 판정
+  let judged = PKG.compose.map((w,i)=>({word:w, contains: sents[i].includes(stem(w)), score:null, feedback:null}));
+  judged.forEach((j,i)=>{ const fb=$("compfb"+i); fb.hidden=false; fb.innerHTML=j.contains?`<span class="thinking"><i></i>낱말이 들어 있어요. AI가 뜻에 맞게 쓰였는지 보는 중…</span>`:`<span class="chip bad">낱말 없음</span> ‘${j.word}’가 문장에 들어가야 해요.`; });
+  const fn = sampleFn || await samplePromise;
+  if(fn){
+    try{
+      const prompt = `초등학교 3학년 학생이 낱말을 넣어 지은 짧은 문장을 채점해 주세요. 각 낱말이 뜻에 맞게 자연스럽게 쓰였는지 판단합니다.\n`+PKG.compose.map((w,i)=>{const v=PKG.vocab.find(x=>x.word===w);return `${i+1}. 낱말: ${w} (뜻: ${v.meaning}) / 학생 문장: "${sents[i]}"`;}).join("\n")+`\n\nJSON 배열만 답하세요. 각 항목: {"score":"적절"|"부분"|"부적절","feedback":"학생에게 주는 격려 섞인 한 문장(존댓말, 25자 내외)"}`;
+      const out = await fn.json(prompt,{modelTier:"quick"});
+      if(Array.isArray(out)) out.forEach((o,i)=>{ if(judged[i]){ judged[i].score=String(o.score||""); judged[i].feedback=String(o.feedback||""); } });
+    }catch(e){ judged.forEach(j=>{ j.feedback = errCopy(e); }); }
+  } else { judged.forEach(j=>{ j.feedback="(AI 미연결) 낱말 포함 여부만 확인했어요."; }); }
+  judged.forEach((j,i)=>{ const fb=$("compfb"+i); const cls=j.score==="적절"?"good":j.score==="부분"?"warn":(j.score?"bad":(j.contains?"good":"bad")); fb.innerHTML=`<span class="chip ${cls}">${j.score||(j.contains?"포함":"낱말 없음")}</span> ${j.feedback||""}`; });
+  R.v={quiz:{correct,total:5,ans}, compose:judged};
+  const good=judged.filter(j=>j.score==="적절"||(j.score===null&&j.contains)).length;
+  $("s1result").hidden=false; $("s1result").innerHTML=`<div class="kpis"><div class="kpi"><div class="l">어휘 정답률</div><div class="v">${pct(correct,5)}%</div><div class="s">${correct}/5</div></div><div class="kpi"><div class="l">어휘 활용(글짓기)</div><div class="v">${good}/2</div><div class="s">적절하게 쓴 문장</div></div></div>`;
+  R.done[1]=true; status("① 완료. 다음 단계로 가세요."); mainBtn("② 개념·인출로", ()=>setStage(2));
+}
+
+// ---------- ② 개념 ----------
+function initS2(){
+  if($("ctext").children.length) return;
+  const p=PKG.concept.parts.map(x=>typeof x==="number"?`<span class="kw">${PKG.concept.blanks[x].k}</span>`:x).join("");
+  $("ctext").innerHTML=p;
+  mainBtn("다 읽었어요 → 빈칸 채우기", ()=>{
+    $("c-read").hidden=true; $("c-fill").hidden=false;
+    $("cblanks").innerHTML=PKG.concept.parts.map(x=>typeof x==="number"?`<span class="blank" data-i="${x}"><input id="bl${x}" autocomplete="off" aria-label="빈칸 ${x+1}"><select id="cf${x}" aria-label="확신도"><option value="sure">확실</option><option value="maybe" selected>아마</option><option value="unknown">모름</option></select></span>`:x).join("");
+    mainBtn("제출", gradeS2); status("빈칸을 채우고 확신도를 고르세요.");
+  });
+  status("개념 글을 한 번만 읽을 수 있어요.");
+}
+function norm(s){ return s.replace(/\s+/g,"").replace(/[을를이가은는]$/,""); }
+async function gradeS2(){
+  const rows=PKG.concept.blanks.map((b,i)=>{ const a=$("bl"+i).value.trim(); const c=$("cf"+i).value; const n=norm(a); let res="wrong"; if(n && (n===norm(b.k)||b.ok.map(norm).includes(n))) res="exact"; return {k:b.k,a,c,res}; });
+  // 유사어 판정 (틀린 것만 AI에)
+  const need=rows.filter(r=>r.res==="wrong"&&r.a);
+  const fn = sampleFn || await samplePromise;
+  if(fn && need.length){
+    try{ const out=await fn.json(`초등 3학년 국어 빈칸 채우기 채점. 각 항목에서 학생 답이 정답과 같은 뜻(유의어·표기 변형)이면 true, 아니면 false.\n${need.map((r,i)=>`${i+1}. 정답: ${r.k} / 학생 답: ${r.a}`).join("\n")}\nJSON 배열(boolean)만 답하세요.`,{modelTier:"quick"}); if(Array.isArray(out)) need.forEach((r,i)=>{ if(out[i]===true) r.res="similar"; }); }catch(e){}
+  }
+  rows.forEach((r,i)=>{ const b=$("bl"+i).closest(".blank"); b.classList.add(r.res==="exact"?"right":r.res==="similar"?"similar":"wrong"); $("bl"+i).disabled=true; $("cf"+i).disabled=true; if(r.res!=="exact") $("bl"+i).value=(r.a||"—")+" → "+r.k; });
+  const score=rows.reduce((s,r)=>s+(r.res==="exact"?1:r.res==="similar"?.5:0),0);
+  const conf=rows.filter(r=>(r.c==="sure"&&r.res!=="wrong")||(r.c==="unknown"&&r.res==="wrong")||(r.c==="maybe")).length;
+  const illusion=rows.filter(r=>r.c==="sure"&&r.res==="wrong").length;
+  const under=rows.filter(r=>r.c==="unknown"&&r.res!=="wrong").length;
+  R.c={rows,recall:pct(score,rows.length),conf:pct(conf,rows.length),illusion,under};
+  $("s2result").hidden=false; $("s2result").innerHTML=`<div class="kpis"><div class="kpi"><div class="l">인출 성공률</div><div class="v">${R.c.recall}%</div><div class="s">${score}/${rows.length} (유사 0.5)</div></div><div class="kpi"><div class="l">확신도 정확도</div><div class="v">${R.c.conf}%</div><div class="s">예측과 실제 일치</div></div><div class="kpi"><div class="l">착각</div><div class="v">${illusion}</div><div class="s">확실 → 오답</div></div><div class="kpi"><div class="l">과소평가</div><div class="v">${under}</div><div class="s">모름 → 정답</div></div></div><p class="note" style="margin-top:10px">인출 성공률은 <b>인출 기반</b>, 확신도 정확도는 RoCAT 자기 점검과 같은 <b>예측 기반</b> 지표입니다. 둘을 교차하면 “모르는데 안다고 생각하는” 지점이 드러납니다.</p>`;
+  R.done[2]=true; status("② 완료."); mainBtn("③ 읽기·진단으로", ()=>setStage(3));
+}
+
+// ---------- ③ 읽기 ----------
+const G={t0:null,last:null,lastP:null,dwell:[0,0,0,0],reg:0,moves:0,maxP:-1};
+function initS3(){
+  if($("passage").children.length) return;
+  const P=$("passage"); P.innerHTML=`<h3>${"소금은 어디에서 올까"}</h3>`;
+  let k=0;
+  PKG.paragraphs.forEach((p,i)=>{ const d=el("div","para"); d.dataset.i=i; d.innerHTML=`<span class="role">${p.role}</span>`+p.s.map(()=>`<span class="sent" data-k="${k++}"></span>`).join(" "); P.append(d); });
+  P.querySelectorAll(".sent").forEach(s=>s.textContent=SENT[+s.dataset.k]);
+  G.t0=performance.now();
+  const track=e=>{ const now=performance.now(); const pe=e.target.closest? e.target.closest(".para"):null; if(pe){ const i=+pe.dataset.i; if(G.last!==null&&G.lastP!==null&&now-G.last<1500) G.dwell[G.lastP]+=now-G.last; if(G.lastP!==null&&i<G.lastP) G.reg++; if(i>G.maxP) G.maxP=i; G.lastP=i; G.moves++; } G.last=now; };
+  P.addEventListener("pointermove",track); P.addEventListener("pointerdown",track);
+  // 스크롤 기반 보조: 화면 중앙에 있는 문단에 시간 적립
+  const io=new IntersectionObserver(ents=>{ ents.forEach(en=>{ if(en.isIntersecting){ const i=+en.target.dataset.i; if(G.lastP===null||Math.abs(i-G.lastP)>=1){ /* scroll moved focus */ } } }); },{rootMargin:"-40% 0px -40% 0px"});
+  P.querySelectorAll(".para").forEach(p=>io.observe(p));
+  mainBtn("다 읽었어요 → 핵심 문장 찾기", startKeySelect);
+  status("처음부터 끝까지 읽으세요.");
+}
+function startKeySelect(){
+  const elapsed=performance.now()-G.t0;
+  const tracked=G.dwell.reduce((a,b)=>a+b,0);
+  let dwell=G.dwell.slice(), est=false;
+  if(tracked<elapsed*0.3){ est=true; const chars=PKG.paragraphs.map(p=>p.s.join("").length); dwell=chars.map(c=>elapsed*c/TOTAL_CHARS); }
+  const chars=PKG.paragraphs.map(p=>p.s.join("").length);
+  const rate=dwell.map((d,i)=>d/chars[i]); const hot=rate.indexOf(Math.max(...rate));
+  R.g={elapsed,tracked,dwell,est,reg:G.reg,hot,speed:Math.round(TOTAL_CHARS/(elapsed/60000)),coverage:Math.min(100,pct(tracked,elapsed)),order:G.maxP>=3};
+  const gz=$("gaze"); gz.hidden=false;
+  gz.innerHTML=`<h3 style="font-size:15px;margin-bottom:10px">읽기 기록 <span class="tiny">${est?"(포인터 기록이 적어 글자 수 비례로 추정)":"(포인터 체류 기준)"}</span></h3><div class="kpis" style="margin-bottom:12px"><div class="kpi"><div class="l">읽은 시간</div><div class="v">${(elapsed/1000).toFixed(0)}초</div></div><div class="kpi"><div class="l">읽기 속도</div><div class="v">${R.g.speed}</div><div class="s">글자/분</div></div><div class="kpi"><div class="l">역행</div><div class="v">${G.reg}</div><div class="s">앞 문단으로 되돌아감</div></div><div class="kpi"><div class="l">체류 포착률</div><div class="v">${R.g.coverage}%</div><div class="s">데모 대체 지표</div></div></div><div class="gaze">${PKG.paragraphs.map((p,i)=>`<div class="row ${i===hot?"hot":""}"><span>${p.role}</span><div class="bar"><i style="width:${pct(dwell[i],Math.max(...dwell))}%"></i></div><span class="v">${(dwell[i]/1000).toFixed(1)}초</span></div>`).join("")}</div><p class="note" style="margin-top:10px">글자 수 대비 가장 오래 머문 문단: <b>${PKG.paragraphs[hot].role}</b> — 병목 후보. 실제 제품은 시선 고정·역행을 문장 단위로 잡습니다.</p>`;
+  $("passage").classList.add("sel-mode"); $("r-guide").textContent="각 문단에서 중심 문장을 하나씩 골라 누르세요. (4개)";
+  $("passage").querySelectorAll(".sent").forEach(s=>{ s.onclick=()=>{ s.classList.toggle("picked"); const n=$("passage").querySelectorAll(".sent.picked").length; status(`${n}/4 선택`); }; });
+  mainBtn("선택 완료 → 문제 풀기", ()=>{ const picked=[...$("passage").querySelectorAll(".sent.picked")].map(s=>+s.dataset.k); if(picked.length!==4){ status("중심 문장 4개를 고르세요."); return; } finishKey(picked); });
+  gz.scrollIntoView({behavior:"smooth",block:"start"});
+}
+function finishKey(picked){
+  const hit=picked.filter(k=>PKG.key.includes(k)).length;
+  R.r={key:{hit,picked}};
+  $("passage").classList.remove("sel-mode"); $("passage").querySelectorAll(".sent").forEach(s=>{ s.onclick=null; if(PKG.key.includes(+s.dataset.k)) s.classList.add("key"); });
+  $("r-guide").innerHTML=`핵심 문장 ${hit}/4 정답. <span class="tiny">파랑 = 정답, 초록 = 맞게 고름, 빨강 = 잘못 고름</span>`;
+  const rq=$("rquiz"); rq.hidden=false; rq.innerHTML=`<h3 style="font-size:15px;margin-bottom:6px">이해도 확인 <span class="tiny">사실적 이해 5 · 추론적 이해 2</span></h3>`;
+  PKG.questions.forEach((q,i)=>rq.append(renderQ(q,i,"rq")));
+  mainBtn("제출", gradeS3); status("문제 7개를 풀어 주세요."); rq.scrollIntoView({behavior:"smooth",block:"start"});
+}
+function gradeS3(){
+  const ans=readAnswers("rq",7); if(ans.includes(null)){ status("문제를 모두 풀어 주세요."); return; }
+  markQ("rq",PKG.questions,ans);
+  const f=PKG.questions.map((q,i)=>({t:q.t,ok:ans[i]===q.a}));
+  const fact=f.filter(x=>x.t==="사실적"), inf=f.filter(x=>x.t==="추론적");
+  R.r.fact=pct(fact.filter(x=>x.ok).length,fact.length); R.r.infer=pct(inf.filter(x=>x.ok).length,inf.length); R.r.ans=ans;
+  $("s3result").hidden=false; $("s3result").innerHTML=`<div class="kpis"><div class="kpi"><div class="l">사실적 이해</div><div class="v">${R.r.fact}%</div><div class="s">${fact.filter(x=>x.ok).length}/5</div></div><div class="kpi"><div class="l">추론적 이해</div><div class="v">${R.r.infer}%</div><div class="s">${inf.filter(x=>x.ok).length}/2</div></div><div class="kpi"><div class="l">핵심 문장</div><div class="v">${R.r.key.hit}/4</div><div class="s">구조 파악</div></div></div>`;
+  R.done[3]=true; status("③ 완료."); mainBtn("④ 구조화·글쓰기로", ()=>setStage(4));
+}
+
+// ---------- ④ 구조화·글쓰기 ----------
+const O={sel:null,slots:[[],[],[]]};
+function initS4(){
+  if($("schips").children.length) return;
+  SENT.forEach((s,k)=>{ const b=el("button","schip",s); b.dataset.k=k; b.onclick=()=>{ if(b.classList.contains("used")) return; document.querySelectorAll(".schip").forEach(x=>x.classList.remove("sel")); if(O.sel===k){O.sel=null;}else{O.sel=k;b.classList.add("sel");} document.querySelectorAll(".slot").forEach(x=>x.classList.toggle("target",O.sel!==null)); status(O.sel!==null?"들어갈 자리를 누르세요.":"문장을 고르세요."); }; $("schips").append(b); });
+  renderSlots();
+  mainBtn("뼈대 완성 → 글쓰기", gradeOutline); status("문장을 고르세요.");
+}
+function renderSlots(){
+  const S=$("slots"); S.innerHTML="";
+  PKG.outline.slots.forEach((sl,i)=>{ const d=el("div","slot"); d.innerHTML=`<h4>${sl.label}<span class="tiny">${O.slots[i].length}/${sl.s.length}</span></h4><div class="hint">${sl.hint}</div>`; O.slots[i].forEach(k=>{ const it=el("div","item"); it.innerHTML=`<span>${SENT[k]}</span><button aria-label="빼기">✕</button>`; it.querySelector("button").onclick=e=>{ e.stopPropagation(); O.slots[i]=O.slots[i].filter(x=>x!==k); document.querySelector(`.schip[data-k="${k}"]`).classList.remove("used"); renderSlots(); }; d.append(it); }); d.onclick=()=>{ if(O.sel===null) return; if(O.slots[i].length>=sl.s.length){ status(`${sl.label}에는 ${sl.s.length}문장까지 넣을 수 있어요.`); return; } O.slots[i].push(O.sel); const c=document.querySelector(`.schip[data-k="${O.sel}"]`); c.classList.add("used"); c.classList.remove("sel"); O.sel=null; document.querySelectorAll(".slot").forEach(x=>x.classList.remove("target")); renderSlots(); status("문장을 고르세요."); }; S.append(d); });
+}
+function gradeOutline(){
+  const total=PKG.outline.slots.reduce((a,s)=>a+s.s.length,0); const filled=O.slots.reduce((a,s)=>a+s.length,0);
+  if(filled<total){ status(`뼈대를 다 채워 주세요. (${filled}/${total})`); return; }
+  let hit=0; PKG.outline.slots.forEach((sl,i)=>{ O.slots[i].forEach(k=>{ if(sl.s.includes(k)) hit++; }); });
+  R.o={hit,total};
+  // 표시
+  document.querySelectorAll("#slots .slot").forEach((d,i)=>{ d.onclick=null; d.querySelectorAll(".item").forEach((it,j)=>{ it.classList.add(PKG.outline.slots[i].s.includes(O.slots[i][j])?"ok":"no"); it.querySelector("button").remove(); }); });
+  $("o-score").hidden=false; $("o-score").innerHTML=`<div class="kpis"><div class="kpi"><div class="l">뼈대 정확도</div><div class="v">${pct(hit,total)}%</div><div class="s">${hit}/${total} 문장이 제자리</div></div></div>`;
+  $("o-write").hidden=false;
+  $("slots-ref").innerHTML=PKG.outline.slots.map((sl,i)=>`<div class="slot" style="cursor:default;min-height:0"><h4>${sl.label}</h4>${sl.s.map(k=>`<div class="item">${SENT[k]}</div>`).join("")}</div>`).join("");
+  $("kwlist").innerHTML=KEYWORDS.map(k=>`<span class="kw" data-k="${k}">${k}</span>`).join("");
+  $("essay").oninput=updateMeter; updateMeter();
+  mainBtn("첨삭 받기", gradeS4); status("뼈대를 보면서 간추려 쓰세요."); $("o-write").scrollIntoView({behavior:"smooth",block:"start"});
+}
+function kwFound(text){ return KEYWORDS.map(k=>({k,on:text.includes(stem(k).replace(/\s+/g,""))||text.includes(stem(k))})); }
+function updateMeter(){ const t=$("essay").value; $("cc").textContent=t.replace(/\s/g,"").length+"자"; const f=kwFound(t); const n=f.filter(x=>x.on).length; $("kwbar").style.width=pct(n,KEYWORDS.length)+"%"; $("kwpct").textContent=`낱말 ${n}/${KEYWORDS.length}`; f.forEach(x=>{ const e=document.querySelector(`.kw[data-k="${x.k}"]`); if(e) e.classList.toggle("on",x.on); }); }
+let essayCtl=null;
+async function gradeS4(){
+  const text=$("essay").value.trim(); if(text.replace(/\s/g,"").length<40){ status("40자 이상 써 주세요."); return; }
+  const f=kwFound(text); const kwn=f.filter(x=>x.on).length;
+  const local={kw:pct(kwn,KEYWORDS.length),len:text.replace(/\s/g,"").length,sents:text.split(/[.!?。]\s*/).filter(s=>s.trim()).length};
+  const fb=$("feedback"); fb.hidden=false; fb.innerHTML=`<div class="thinking"><i></i>AI가 글을 읽고 있어요… (첫 응답까지 수십 초 걸릴 수 있어요)</div>`;
+  $("btn-main").disabled=true; fb.scrollIntoView({behavior:"smooth",block:"start"});
+  const fn = sampleFn || await samplePromise;
+  let ai=null, err=null;
+  if(fn){
+    essayCtl=new AbortController();
+    const prompt=`당신은 초등학교 3학년 국어 교사입니다. 학생이 지문을 읽고 '처음-중간-끝' 뼈대에 따라 간추려 쓴 글을 첨삭합니다. 격려를 앞세우고, 교정은 꼭 필요한 것만 최대 4개, 존댓말로 씁니다.
+
+[지문]
+${PKG.paragraphs.map(p=>p.s.join(" ")).join("\n")}
+
+[정답 뼈대]
+${PKG.outline.slots.map(s=>`${s.label}: ${s.s.map(k=>SENT[k]).join(" / ")}`).join("\n")}
+
+[요약 기준]
+${PKG.outline.ref}
+
+[학생 글]
+${text}
+
+다음 JSON 객체만 답하세요:
+{"structure":{"score":1~5,"note":"처음-중간-끝이 드러나는지 한 문장"},"coherence":{"score":1~5,"note":"문장이 자연스럽게 이어지는지 한 문장"},"fidelity":{"score":1~5,"note":"요약 기준의 핵심 내용을 담았는지 한 문장"},"corrections":[{"original":"학생 글에서 그대로 인용","suggestion":"고친 문장","type":"맞춤법|문법|어색한 표현|중의적 표현","reason":"3학년이 이해할 한 문장"}],"praise":"잘한 점 한 문장","next_step":"다음에 해 볼 것 한 문장"}`;
+    try{ ai=await fn.json(prompt,{signal:essayCtl.signal}); }catch(e){ err=e; }
+  }
+  R.w={local,ai,text};
+  const sc=(o,l)=>`<div class="score"><div class="l">${l}</div><div class="v">${o?o.score:"—"}<span class="tiny">/5</span></div><div class="n">${o?o.note:""}</div></div>`;
+  fb.innerHTML=`<h3 style="font-size:15px;margin-bottom:10px">첨삭 결과 ${ai?"":`<span class="chip warn">규칙 기반</span>`}</h3>
+  <div class="kpis" style="margin-bottom:10px"><div class="kpi"><div class="l">핵심 낱말 포함율</div><div class="v">${local.kw}%</div><div class="s">${kwn}/${KEYWORDS.length} · ①어휘 + ②개념</div></div><div class="kpi"><div class="l">글자 수</div><div class="v">${local.len}</div><div class="s">가이드 ${PKG.outline.guide}자</div></div><div class="kpi"><div class="l">문장 수</div><div class="v">${local.sents}</div></div></div>
+  ${ai?`<div class="scores" style="margin-bottom:12px">${sc(ai.structure,"구조 충족")}${sc(ai.coherence,"문단 연결")}${sc(ai.fidelity,"요약 충실도")}</div>
+  ${ai.praise?`<p style="margin-bottom:8px"><span class="chip good">잘한 점</span> ${ai.praise}</p>`:""}
+  ${Array.isArray(ai.corrections)&&ai.corrections.length?`<div class="corr" style="margin-bottom:10px">${ai.corrections.slice(0,4).map(c=>`<div class="c"><span class="chip">${c.type||"교정"}</span><span class="o">${c.original||""}</span><span class="s">${c.suggestion||""}</span><span class="r">${c.reason||""}</span></div>`).join("")}</div>`:`<p class="muted" style="margin-bottom:8px">고칠 문장이 없어요.</p>`}
+  ${ai.next_step?`<p><span class="chip">다음에는</span> ${ai.next_step}</p>`:""}`
+  :`<p class="muted">${err?errCopy(err):"AI가 연결되지 않은 환경입니다."} 규칙 기반 지표만 표시했습니다.</p>`}`;
+  R.done[4]=true; $("btn-main").disabled=false; status("④ 완료."); mainBtn("회차 리포트 보기", ()=>setStage(5));
+}
+
+// ---------- 리포트 ----------
+function initS5(){
+  const v=R.v||{quiz:{correct:0,total:5},compose:[]}, c=R.c||{recall:0,conf:0,illusion:0,under:0}, g=R.g||{}, r=R.r||{fact:0,infer:0,key:{hit:0}}, o=R.o||{hit:0,total:5}, w=R.w||{local:{kw:0},ai:null};
+  const goodCompose=(v.compose||[]).filter(j=>j.score==="적절"||(j.score===null&&j.contains)).length;
+  const row=(l,val,s)=>`<div class="mrow"><span>${l}${s?` <span class="tiny">${s}</span>`:""}</span><span class="v">${val}</span></div>`;
+  const rx=[];
+  if(pct(v.quiz.correct,5)<70) rx.push(["어휘","정답률 70% 미만 → 같은 단원 복습 회차 배정, 복습실 세트 자동 생성"]);
+  if(c.recall<50&&c.illusion>0) rx.push(["개념","인출 50% 미만 + 착각 있음 → 같은 개념문을 빈칸 위치 바꿔 재인출"]);
+  if(r.infer<r.fact-30) rx.push(["읽기","추론이 사실보다 30%p 이상 낮음 → 단계 유지, 추론 문항 비중 상향"]);
+  if(g.hot!==undefined) rx.push(["습관",`‘${PKG.paragraphs[g.hot].role}’ 문단에서 가장 오래 머묾 → 같은 구조(처음-중간-끝) 지문 반복 시 병목 여부 확인`]);
+  if(w.local.kw<60) rx.push(["표현","핵심 낱말 포함율 60% 미만 → 다음 회차 ④ 뼈대 단계 재수행"]);
+  if(r.fact>=85&&r.infer>=85&&pct(o.hit,o.total)>=80) rx.push(["단계","사실·추론·구조 모두 우수 → 다음 회차 3단계(심화) 지문 배정"]);
+  if(!rx.length) rx.push(["유지","약점 신호 없음 → 같은 단계로 다음 회차 진행"]);
+  $("report").innerHTML=`
+  <div class="areas">
+    <div class="card area"><h3>인지·문해 <span class="tiny">① ② ③</span></h3>${row("어휘 정답률",pct(v.quiz.correct,5)+"%","활용 문제 5")}${row("어휘 활용",goodCompose+"/2","짧은 글짓기")}${row("개념 인출 성공률",c.recall+"%","빈칸 5")}${row("확신도 정확도",c.conf+"%","착각 "+c.illusion+" · 과소평가 "+c.under)}${row("사실적 이해",r.fact+"%","5문항")}${row("추론적 이해",r.infer+"%","2문항")}</div>
+    <div class="card area b"><h3>행동·습관 <span class="tiny">③</span></h3>${row("읽기 속도",(g.speed||0)+" 글자/분")}${row("읽은 시간",g.elapsed?(g.elapsed/1000).toFixed(0)+"초":"—")}${row("역행 횟수",g.reg??"—","앞 문단으로 되돌아감")}${row("병목 문단",g.hot!==undefined?PKG.paragraphs[g.hot].role:"—","글자당 체류 최대")}${row("핵심 문장 파악",(r.key.hit||0)+"/4","구조 파악")}${row("끝까지 읽음",g.order?"예":"확인 안 됨")}</div>
+    <div class="card area c"><h3>표현·사고 <span class="tiny">④</span></h3>${row("뼈대 정확도",pct(o.hit,o.total)+"%",o.hit+"/"+o.total)}${row("핵심 낱말 포함율",w.local.kw+"%","①어휘+②개념 15개")}${row("구조 충족",w.ai?w.ai.structure.score+"/5":"—","AI")}${row("문단 연결",w.ai?w.ai.coherence.score+"/5":"—","AI")}${row("요약 충실도",w.ai?w.ai.fidelity.score+"/5":"—","AI")}${row("교정 제안",w.ai&&Array.isArray(w.ai.corrections)?w.ai.corrections.length+"건":"—")}</div>
+  </div>
+  <div class="card"><h3 style="font-size:15px;margin-bottom:10px">맞춤형 후속 경로 <span class="tiny">규칙 기반 v1</span></h3><div class="rx">${rx.map(x=>`<div class="r"><b>${x[0]}</b><span>${x[1]}</span></div>`).join("")}</div></div>
+  <p class="note">데모 한계: 시선 추적은 포인터 체류·역행으로 대체했고, 회차 패키지는 검수 전 상태입니다. 실제 제품에서는 핵심 문장 찾기의 시선 엔진, RoCAT 지표(고정 시간·시폭·역행), 30일 전·RoCAT 3중 비교가 붙습니다.</p>`;
+  R.done[5]=true; status("회차 완료."); mainBtn("처음부터 다시", ()=>location.reload());
+}
+
+setStage(1);
+</script>

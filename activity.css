@@ -1,0 +1,41 @@
+/* New activities use the existing Toss-style palette and components. */
+#activity-panel { padding-top: 20px; padding-bottom: 40px; }
+.activity-header { margin-bottom: 24px; }
+.activity-heading { display: flex; gap: 14px; align-items: center; margin-bottom: 16px; }
+.activity-heading h1 { font-size: clamp(22px, 3.5vw, 30px); line-height: 1.4; margin: 0; }
+.activity-header progress { width: 100%; margin: 12px 0 6px; height: 6px; }
+.activity-passage, .activity-question { margin-bottom: 24px; }
+.activity-passage h2, .activity-question h2 { font-size: 21px; line-height: 1.7; margin-bottom: 20px; white-space: pre-line; }
+.activity-passage > p { font-size: 18px; line-height: 2; margin-block: 20px; word-break: keep-all; overflow-wrap: anywhere; }
+.activity-passage > .muted, .activity-passage > .tiny { font-size: 14px; line-height: 1.7; }
+.activity-passage > .activity-auto-text { font-size: clamp(21px, 4vw, 28px); min-height: 160px; display: flex; align-items: center; padding-block: 24px; }
+.activity-option { display: flex; align-items: center; gap: 12px; min-height: 60px; border: 1.5px solid var(--border-default); border-radius: var(--radius-medium); padding: 16px; margin-top: 12px; cursor: pointer; line-height: 1.7; }
+.activity-option input { flex: 0 0 20px; width: 20px; height: 20px; accent-color: var(--area-action); }
+.activity-option span { flex: 1; overflow-wrap: anywhere; }
+.activity-option small { flex: 0 0 auto; font-weight: 700; }
+.activity-option.selected { border-color: var(--area-action); background: var(--area-soft); }
+.activity-option.correct, .activity-feedback.correct { border-color: var(--success); color: var(--success); background: var(--success-background); }
+.activity-option.incorrect, .activity-feedback.incorrect { border-color: var(--danger); border-style: dashed; color: var(--danger); background: var(--danger-background); }
+.activity-feedback:not(:empty) { border: 1px solid; border-radius: 12px; padding: 18px; margin-top: 24px; line-height: 1.8; }
+.activity-feedback p { margin-top: 8px; }
+.activity-actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: flex-end; margin: 24px 0; }
+.activity-actions .btn { min-width: 140px; }
+.activity-paragraph { display: flex; flex-direction: column; gap: 12px; text-align: left; width: 100%; background: var(--background-surface); border: 1.5px solid var(--border-default); border-radius: var(--radius-medium); padding: 20px; margin: 12px 0; font: inherit; line-height: 1.8; color: var(--text-primary); cursor: pointer; }
+.activity-paragraph:disabled { background: var(--area-soft); color: var(--text-secondary); cursor: default; opacity: 1; }
+.activity-order-summary { background: var(--background-subtle); border-radius: 12px; padding: 16px; line-height: 1.8; }
+.activity-result { margin-bottom: 24px; }
+.activity-result h1 { font-size: 26px; margin: 14px 0; }
+.activity-score { display: block; font-size: 52px; margin-bottom: 16px; color: var(--action-primary); }
+.activity-result p { line-height: 1.9; }
+.activity-read-results { border-top: 1px solid var(--border-default); margin-top: 20px; padding-top: 16px; }
+.activity-review-item { padding: 18px 0; border-bottom: 1px solid var(--border-default); }
+.activity-review-item summary { cursor: pointer; line-height: 1.8; white-space: pre-line; }
+.activity-review-item p { margin-top: 12px; line-height: 1.8; }
+@media (max-width: 600px) {
+  .activity-option { padding: 14px 12px; gap: 10px; align-items: flex-start; }
+  .activity-option input { margin-top: 4px; }
+  .activity-option small { font-size: 11px; }
+  .activity-actions .btn { flex: 1; min-width: 120px; }
+  .activity-passage > p { font-size: 17px; }
+  .activity-paragraph { padding: 16px; }
+}

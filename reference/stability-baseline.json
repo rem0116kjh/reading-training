@@ -1,0 +1,8 @@
+{
+  "training-store.js": "80de134b88b279796fbeed568ed287681fa768b43bc0ef15b7090697657e3921",
+  "feedback.js": "3db7a59d8934fd99f207e223a01f6fae69687501393dde1fdc346f92ac6aa706",
+  "styles.css": "1ef90297a3f4fd5fde1f00a84b06c344ea36f6648b59a6fb6a03265b1c508b26",
+  "tests/app-flow.test.cjs": "300f787d0253feb4630aa126694ef037410db046b5d692aaf161d7fcdea2097f",
+  "tests/feedback.test.cjs": "29ac920b80b329385e094b9068ae0efdafb02c97cdfc7946b4b93c05c0479b7a",
+  "tests/training-store.test.cjs": "86787d0f614f1e104b475a9d46a30cb3fea944f9e4740cbc0d8e8da70dd172b2"
+}
