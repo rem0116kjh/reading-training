@@ -303,7 +303,12 @@ document.querySelectorAll('#rail button').forEach(button=>button.onclick=()=>nav
 document.addEventListener('visibilitychange',()=>{tick();persist();lastTick=performance.now();pointerSample={at:null,paragraph:null};});
 window.addEventListener('pagehide',()=>{tick();persist();});
 window.addEventListener('beforeunload',()=>{tick();persist();});
-setInterval(()=>{tick();updateProgress();if(++saveCounter%5===0)persist();},1000);
+setInterval(()=>{
+  // Keep idle screens from recalculating results or writing an unchanged lesson.
+  if(!isLearningActive()){lastTick=performance.now();return;}
+  tick();
+  if(++saveCounter%5===0)persist();else updateProgress();
+},1000);
 setWarning(loaded.warning);
 if(gateOpen){
   $('resume-description').textContent=`${S.title} · ${S.mode==='full'?'전체 학습':'재학습'} · 진행률 ${progress(S)}% · ${formatTime(S.elapsedMs)}`;

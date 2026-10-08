@@ -1,0 +1,120 @@
+{
+  "scope": "Synthetic jsdom timer work counts; not device FPS or real browser latency",
+  "before": [
+    {
+      "name": "home-30s",
+      "elapsedMs": 11.64,
+      "storageWrites": {
+        "trainingSession": 6
+      },
+      "domMutations": 228,
+      "dateFormatters": 0
+    },
+    {
+      "name": "before-reading-start-30s",
+      "elapsedMs": 28.9,
+      "storageWrites": {
+        "areaTrainingSession.v1": 30,
+        "trainingSession": 6
+      },
+      "domMutations": 888,
+      "dateFormatters": 0
+    },
+    {
+      "name": "tap-reading-10s",
+      "elapsedMs": 21.41,
+      "storageWrites": {
+        "areaTrainingSession.v1": 10,
+        "trainingSession": 2
+      },
+      "domMutations": 596,
+      "dateFormatters": 0
+    },
+    {
+      "name": "paced-reading-10s",
+      "elapsedMs": 11.99,
+      "storageWrites": {
+        "areaTrainingSession.v1": 10,
+        "trainingSession": 2
+      },
+      "domMutations": 812,
+      "dateFormatters": 0
+    },
+    {
+      "name": "menu-paused-10s",
+      "elapsedMs": 4.85,
+      "storageWrites": {
+        "trainingSession": 2
+      },
+      "domMutations": 76,
+      "dateFormatters": 0
+    },
+    {
+      "name": "home-with-200-records",
+      "elapsedMs": 25.04,
+      "storageWrites": {
+        "areaTrainingSession.v1": 2,
+        "trainingSession": 1
+      },
+      "domMutations": 48,
+      "dateFormatters": 208
+    }
+  ],
+  "after": [
+    {
+      "name": "home-30s",
+      "elapsedMs": 0.29,
+      "storageWrites": {},
+      "domMutations": 0,
+      "dateFormatters": 0
+    },
+    {
+      "name": "before-reading-start-30s",
+      "elapsedMs": 1.65,
+      "storageWrites": {},
+      "domMutations": 0,
+      "dateFormatters": 0
+    },
+    {
+      "name": "tap-reading-10s",
+      "elapsedMs": 1.19,
+      "storageWrites": {
+        "areaTrainingSession.v1": 10
+      },
+      "domMutations": 10,
+      "dateFormatters": 0
+    },
+    {
+      "name": "paced-reading-10s",
+      "elapsedMs": 2.31,
+      "storageWrites": {
+        "areaTrainingSession.v1": 10
+      },
+      "domMutations": 112,
+      "dateFormatters": 0
+    },
+    {
+      "name": "menu-paused-10s",
+      "elapsedMs": 0.34,
+      "storageWrites": {},
+      "domMutations": 0,
+      "dateFormatters": 0
+    },
+    {
+      "name": "home-with-200-records",
+      "elapsedMs": 16.53,
+      "storageWrites": {
+        "trainingSession": 1
+      },
+      "domMutations": 47,
+      "dateFormatters": 0
+    }
+  ],
+  "build": {
+    "unminifiedBytes": 342651,
+    "minifiedBytes": 253498,
+    "gzipUnminifiedBytes": 84058,
+    "gzipMinifiedBytes": 71245,
+    "sha256": "591c0e9cc9fa3aa943ae034ce33871fab6365909c1ef915ac1a821e261cdcbc3"
+  }
+}

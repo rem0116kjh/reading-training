@@ -1,0 +1,281 @@
+{
+  "base": "http://127.0.0.1:4183/",
+  "layouts": [
+    {
+      "name": "before",
+      "width": 320,
+      "overflow": false,
+      "cards": [
+        {
+          "x": 14,
+          "y": 686.15625,
+          "width": 132.53125,
+          "height": 296.5,
+          "font": "\"Noto Sans KR\", -apple-system, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif"
+        },
+        {
+          "x": 14,
+          "y": 992.65625,
+          "width": 132.53125,
+          "height": 257.84375,
+          "font": "\"Noto Sans KR\", -apple-system, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif"
+        },
+        {
+          "x": 156.53125,
+          "y": 686.15625,
+          "width": 149.453125,
+          "height": 564.34375,
+          "font": "\"Noto Sans KR\", -apple-system, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif"
+        }
+      ]
+    },
+    {
+      "name": "source",
+      "width": 320,
+      "overflow": false,
+      "cards": [
+        {
+          "x": 14,
+          "y": 686.15625,
+          "width": 132.53125,
+          "height": 296.5,
+          "font": "\"Noto Sans KR\", -apple-system, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif"
+        },
+        {
+          "x": 14,
+          "y": 992.65625,
+          "width": 132.53125,
+          "height": 257.84375,
+          "font": "\"Noto Sans KR\", -apple-system, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif"
+        },
+        {
+          "x": 156.53125,
+          "y": 686.15625,
+          "width": 149.453125,
+          "height": 564.34375,
+          "font": "\"Noto Sans KR\", -apple-system, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif"
+        }
+      ]
+    },
+    {
+      "name": "built",
+      "width": 320,
+      "overflow": false,
+      "cards": [
+        {
+          "x": 14,
+          "y": 686.15625,
+          "width": 132.53125,
+          "height": 296.5,
+          "font": "\"Noto Sans KR\", -apple-system, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif"
+        },
+        {
+          "x": 14,
+          "y": 992.65625,
+          "width": 132.53125,
+          "height": 257.84375,
+          "font": "\"Noto Sans KR\", -apple-system, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif"
+        },
+        {
+          "x": 156.53125,
+          "y": 686.15625,
+          "width": 149.453125,
+          "height": 564.34375,
+          "font": "\"Noto Sans KR\", -apple-system, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif"
+        }
+      ]
+    },
+    {
+      "name": "before",
+      "width": 768,
+      "overflow": false,
+      "cards": [
+        {
+          "x": 32,
+          "y": 524.671875,
+          "width": 273.59375,
+          "height": 328.9375,
+          "font": "\"Noto Sans KR\", -apple-system, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif"
+        },
+        {
+          "x": 32,
+          "y": 873.609375,
+          "width": 273.59375,
+          "height": 286.046875,
+          "font": "\"Noto Sans KR\", -apple-system, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif"
+        },
+        {
+          "x": 325.59375,
+          "y": 524.671875,
+          "width": 410.40625,
+          "height": 634.984375,
+          "font": "\"Noto Sans KR\", -apple-system, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif"
+        }
+      ]
+    },
+    {
+      "name": "source",
+      "width": 768,
+      "overflow": false,
+      "cards": [
+        {
+          "x": 32,
+          "y": 524.671875,
+          "width": 273.59375,
+          "height": 328.9375,
+          "font": "\"Noto Sans KR\", -apple-system, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif"
+        },
+        {
+          "x": 32,
+          "y": 873.609375,
+          "width": 273.59375,
+          "height": 286.046875,
+          "font": "\"Noto Sans KR\", -apple-system, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif"
+        },
+        {
+          "x": 325.59375,
+          "y": 524.671875,
+          "width": 410.40625,
+          "height": 634.984375,
+          "font": "\"Noto Sans KR\", -apple-system, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif"
+        }
+      ]
+    },
+    {
+      "name": "built",
+      "width": 768,
+      "overflow": false,
+      "cards": [
+        {
+          "x": 32,
+          "y": 524.671875,
+          "width": 273.59375,
+          "height": 328.9375,
+          "font": "\"Noto Sans KR\", -apple-system, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif"
+        },
+        {
+          "x": 32,
+          "y": 873.609375,
+          "width": 273.59375,
+          "height": 286.046875,
+          "font": "\"Noto Sans KR\", -apple-system, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif"
+        },
+        {
+          "x": 325.59375,
+          "y": 524.671875,
+          "width": 410.40625,
+          "height": 634.984375,
+          "font": "\"Noto Sans KR\", -apple-system, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif"
+        }
+      ]
+    },
+    {
+      "name": "before",
+      "width": 1440,
+      "overflow": false,
+      "cards": [
+        {
+          "x": 176,
+          "y": 537.265625,
+          "width": 425.59375,
+          "height": 338.125,
+          "font": "\"Noto Sans KR\", -apple-system, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif"
+        },
+        {
+          "x": 176,
+          "y": 899.390625,
+          "width": 425.59375,
+          "height": 294.046875,
+          "font": "\"Noto Sans KR\", -apple-system, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif"
+        },
+        {
+          "x": 625.59375,
+          "y": 537.265625,
+          "width": 638.40625,
+          "height": 656.171875,
+          "font": "\"Noto Sans KR\", -apple-system, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif"
+        }
+      ]
+    },
+    {
+      "name": "source",
+      "width": 1440,
+      "overflow": false,
+      "cards": [
+        {
+          "x": 176,
+          "y": 537.265625,
+          "width": 425.59375,
+          "height": 338.125,
+          "font": "\"Noto Sans KR\", -apple-system, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif"
+        },
+        {
+          "x": 176,
+          "y": 899.390625,
+          "width": 425.59375,
+          "height": 294.046875,
+          "font": "\"Noto Sans KR\", -apple-system, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif"
+        },
+        {
+          "x": 625.59375,
+          "y": 537.265625,
+          "width": 638.40625,
+          "height": 656.171875,
+          "font": "\"Noto Sans KR\", -apple-system, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif"
+        }
+      ]
+    },
+    {
+      "name": "built",
+      "width": 1440,
+      "overflow": false,
+      "cards": [
+        {
+          "x": 176,
+          "y": 537.265625,
+          "width": 425.59375,
+          "height": 338.125,
+          "font": "\"Noto Sans KR\", -apple-system, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif"
+        },
+        {
+          "x": 176,
+          "y": 899.390625,
+          "width": 425.59375,
+          "height": 294.046875,
+          "font": "\"Noto Sans KR\", -apple-system, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif"
+        },
+        {
+          "x": 625.59375,
+          "y": 537.265625,
+          "width": 638.40625,
+          "height": 656.171875,
+          "font": "\"Noto Sans KR\", -apple-system, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif"
+        }
+      ]
+    }
+  ],
+  "journeys": [
+    {
+      "name": "source",
+      "fluencyScore": 100,
+      "fullCourseScore": 100,
+      "questions": 19,
+      "draftReloaded": true,
+      "menuPaused": true,
+      "completedRecords": 2
+    },
+    {
+      "name": "built",
+      "fluencyScore": 100,
+      "fullCourseScore": 100,
+      "questions": 19,
+      "draftReloaded": true,
+      "menuPaused": true,
+      "completedRecords": 2
+    }
+  ],
+  "errors": [],
+  "requestFailures": [],
+  "browser": "154.0.8037.98",
+  "passed": true
+}

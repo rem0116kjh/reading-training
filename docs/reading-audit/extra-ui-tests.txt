@@ -1,0 +1,31 @@
+✔ real entry point keeps home and starts all three distinct area activities (259.07175ms)
+✔ word cards reveal the original meaning and example, count unique views, and preserve quiz state (125.856834ms)
+✔ word preview resumes before answering and never charges card time as question response time (100.853292ms)
+✔ original vocabulary finishes every quiz and last-question retry before saved writing and immutable review (335.135125ms)
+✔ unsubmitted vocabulary choice survives home and reload, with next navigation gated (90.108958ms)
+✔ legacy vocabulary sessions retain 16 meaning and 16 sentence questions and retry behavior (617.887709ms)
+✔ legacy fluency remains restorable and completes each of normal, speed, and automatic reading once and then its preserved quiz (110.841708ms)
+✔ speed reading closes at 60 seconds and automatic reading resumes its sentence without silently running (125.150959ms)
+✔ reading has one passage, one order, one structure, one relation map, and four content questions (316.540292ms)
+✔ reading relation map gates empty slots, saves partial placement, resets and locks submitted choices (163.817542ms)
+✔ each of the four original content quizzes exposes the whole passage and restores choices with the panel folded (337.300333ms)
+✔ incorrect structure placement reviews only the map and keeps the original result immutable (362.623625ms)
+✔ old reading sessions resume their original six questions and existing records remain readable (157.8915ms)
+✔ paragraph order requires all four choices, supports reset, and preserves checked questions when going back (82.740291ms)
+✔ new area clock pauses on home and menu, and never charges time to the saved legacy lesson (54.521625ms)
+✔ full course draft and new area draft coexist across home navigation and reload (102.301042ms)
+✔ historical area result and unified history leave an unfinished area untouched and menu continue restores it (352.855917ms)
+✔ wrong-only retry and repeat area create distinct results without altering the completed source record (370.13175ms)
+✔ switching unfinished areas can be cancelled without losing answers and confirmed replacement keeps records (54.998333ms)
+✔ failed completion persistence retains the result and prevents retry replacement until saving works (323.386834ms)
+✔ reading recall keeps partial drafts and explicit confidence, locks submissions and reports prediction separately (328.436167ms)
+✔ key selection and outline preserve partial positions, replace or remove choices and review only the mistaken activity (406.295958ms)
+✔ summary preserves escaped writing and the reference passage, enforces original 40-character minimum and stays ungraded (324.186916ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6104.81525

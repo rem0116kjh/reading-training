@@ -1,0 +1,8 @@
+{
+  "training-store.js": true,
+  "feedback.js": true,
+  "styles.css": true,
+  "tests/app-flow.test.cjs": true,
+  "tests/feedback.test.cjs": true,
+  "tests/training-store.test.cjs": true
+}

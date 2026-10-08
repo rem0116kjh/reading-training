@@ -75,6 +75,10 @@
       label: '어휘력',
       note: '기존 어휘 10개를 사용하며, 각 단계의 마지막 6문항은 복습이에요.',
       uniqueWordCount: pkg.vocab.length,
+      words: pkg.vocab.map(word => ({
+        word: word.word, meaning: word.meaning, pos: word.pos,
+        example: sentences[word.s]
+      })),
       tasks: [
         ...Array.from({ length: 16 }, (_, number) => vocabularyChoice('meaning', number)),
         ...Array.from({ length: 16 }, (_, number) => vocabularyChoice('sentence', number))

@@ -1,0 +1,75 @@
+{
+  "url": "http://127.0.0.1:52574/",
+  "runs": [],
+  "consoleErrors": [
+    {
+      "name": "desktop",
+      "error": "Failed to load resource: net::ERR_CONNECTION_RESET",
+      "location": {
+        "url": "http://127.0.0.1:52574/fluency-content.js",
+        "line": 0,
+        "column": 0,
+        "lineNumber": 0,
+        "columnNumber": 0
+      }
+    },
+    {
+      "name": "desktop",
+      "error": "Failed to load resource: net::ERR_CONNECTION_RESET",
+      "location": {
+        "url": "http://127.0.0.1:52574/vocabulary-content.js?v=vocabulary-five-20261008-v1",
+        "line": 0,
+        "column": 0,
+        "lineNumber": 0,
+        "columnNumber": 0
+      }
+    },
+    {
+      "name": "desktop",
+      "error": "Failed to load resource: net::ERR_SOCKET_NOT_CONNECTED",
+      "location": {
+        "url": "http://127.0.0.1:52574/reading-content.js?v=reading-20261008-v2",
+        "line": 0,
+        "column": 0,
+        "lineNumber": 0,
+        "columnNumber": 0
+      }
+    },
+    {
+      "name": "desktop",
+      "error": "Failed to load resource: net::ERR_CONNECTION_RESET",
+      "location": {
+        "url": "http://127.0.0.1:52574/fluency-concept-content.js?v=fluency-concept-20261008-v1",
+        "line": 0,
+        "column": 0,
+        "lineNumber": 0,
+        "columnNumber": 0
+      }
+    }
+  ],
+  "failedRequests": [
+    {
+      "name": "desktop",
+      "url": "http://127.0.0.1:52574/fluency-content.js",
+      "error": "net::ERR_CONNECTION_RESET"
+    },
+    {
+      "name": "desktop",
+      "url": "http://127.0.0.1:52574/vocabulary-content.js?v=vocabulary-five-20261008-v1",
+      "error": "net::ERR_CONNECTION_RESET"
+    },
+    {
+      "name": "desktop",
+      "url": "http://127.0.0.1:52574/reading-content.js?v=reading-20261008-v2",
+      "error": "net::ERR_SOCKET_NOT_CONNECTED"
+    },
+    {
+      "name": "desktop",
+      "url": "http://127.0.0.1:52574/fluency-concept-content.js?v=fluency-concept-20261008-v1",
+      "error": "net::ERR_CONNECTION_RESET"
+    }
+  ],
+  "browser": "154.0.8037.98",
+  "passed": false,
+  "error": "page.evaluate: ReferenceError: FluencyConceptContent is not defined\n    at eval (eval at evaluate (:311:30), <anonymous>:2:21)\n    at UtilityScript.evaluate (<anonymous>:313:16)\n    at UtilityScript.<anonymous> (<anonymous>:1:44)\n    at current (/Users/luka/Documents/ChatGPT/test/scripts/test-reading-browser.cjs:17:15)\n    at open (/Users/luka/Documents/ChatGPT/test/scripts/test-reading-browser.cjs:100:18)\n    at async /Users/luka/Documents/ChatGPT/test/scripts/test-reading-browser.cjs:125:31"
+}

@@ -1,0 +1,317 @@
+{
+  "url": "http://127.0.0.1:4183/",
+  "runs": [
+    {
+      "name": "desktop",
+      "geometry": {
+        "reference": {
+          "x": 176,
+          "y": 388.765625,
+          "width": 532,
+          "right": 708
+        },
+        "question": {
+          "x": 732,
+          "y": 388.765625,
+          "width": 532,
+          "right": 1264
+        },
+        "paragraphs": 4,
+        "overflow": false,
+        "independentScroll": "auto",
+        "clientHeight": 650,
+        "scrollHeight": 1309,
+        "open": true
+      },
+      "questions": [
+        {
+          "id": "reading-content-1",
+          "type": "사실적 이해",
+          "answer": "소금"
+        },
+        {
+          "id": "reading-content-2",
+          "type": "사실적 이해",
+          "answer": "염전"
+        },
+        {
+          "id": "reading-content-3",
+          "type": "사실적 이해",
+          "answer": "햇볕에 말린다"
+        },
+        {
+          "id": "reading-content-4",
+          "type": "사실적 이해",
+          "answer": "암염 광산"
+        },
+        {
+          "id": "reading-content-5",
+          "type": "사실적 이해",
+          "answer": "맛을 내고 음식을 오래 보관한다"
+        },
+        {
+          "id": "reading-content-6",
+          "type": "추론적 이해",
+          "answer": "물이 잘 증발해야 소금이 남기 때문에"
+        },
+        {
+          "id": "reading-content-7",
+          "type": "추론적 이해",
+          "answer": "그곳은 아주 오래전에 바다였다"
+        }
+      ],
+      "resumeAt": "reading-content-5",
+      "score": {
+        "correct": 8,
+        "totalQuestions": 9,
+        "wrong": 1,
+        "accuracy": 89,
+        "answered": 9,
+        "mistakes": [
+          "reading-content-6"
+        ],
+        "reviewAttempts": 0,
+        "reviewCorrect": 0,
+        "elapsedMs": 2645.699999984354,
+        "comprehension": {
+          "correct": 6,
+          "total": 7,
+          "answered": 7,
+          "fact": {
+            "correct": 5,
+            "total": 5,
+            "answered": 5
+          },
+          "inference": {
+            "correct": 1,
+            "total": 2,
+            "answered": 2
+          }
+        },
+        "diagnostic": {
+          "readingMs": 147.40000000223517,
+          "skipped": false,
+          "answered": true,
+          "correct": 4,
+          "total": 4
+        },
+        "totalScore": 89,
+        "totalCorrect": 8
+      },
+      "reviewTaskIds": [
+        "reading-content-6"
+      ],
+      "originalUnchanged": true
+    },
+    {
+      "name": "width-375",
+      "geometry": {
+        "reference": {
+          "x": 20,
+          "y": 384.65625,
+          "width": 335,
+          "right": 355
+        },
+        "question": {
+          "x": 20,
+          "y": 730.65625,
+          "width": 335,
+          "right": 355
+        },
+        "paragraphs": 4,
+        "overflow": false,
+        "independentScroll": "auto",
+        "clientHeight": 252,
+        "scrollHeight": 1608,
+        "open": true
+      },
+      "completed": true,
+      "score": {
+        "correct": 9,
+        "totalQuestions": 9,
+        "wrong": 0,
+        "accuracy": 100,
+        "answered": 9,
+        "mistakes": [],
+        "reviewAttempts": 0,
+        "reviewCorrect": 0,
+        "elapsedMs": 3371.9000000096858,
+        "comprehension": {
+          "correct": 7,
+          "total": 7,
+          "answered": 7,
+          "fact": {
+            "correct": 5,
+            "total": 5,
+            "answered": 5
+          },
+          "inference": {
+            "correct": 2,
+            "total": 2,
+            "answered": 2
+          }
+        },
+        "diagnostic": {
+          "readingMs": 117.5,
+          "skipped": false,
+          "answered": true,
+          "correct": 4,
+          "total": 4
+        },
+        "totalScore": 100,
+        "totalCorrect": 9
+      },
+      "remainingTasks": [
+        "reading-content-3",
+        "reading-content-4",
+        "reading-content-5",
+        "reading-content-6",
+        "reading-content-7",
+        "reading-outline",
+        "reading-summary"
+      ]
+    },
+    {
+      "name": "width-320",
+      "geometry": {
+        "reference": {
+          "x": 14,
+          "y": 384.65625,
+          "width": 292,
+          "right": 306
+        },
+        "question": {
+          "x": 14,
+          "y": 730.65625,
+          "width": 292,
+          "right": 306
+        },
+        "paragraphs": 4,
+        "overflow": false,
+        "independentScroll": "auto",
+        "clientHeight": 252,
+        "scrollHeight": 1909,
+        "open": true
+      },
+      "completed": true,
+      "score": {
+        "correct": 9,
+        "totalQuestions": 9,
+        "wrong": 0,
+        "accuracy": 100,
+        "answered": 9,
+        "mistakes": [],
+        "reviewAttempts": 0,
+        "reviewCorrect": 0,
+        "elapsedMs": 3072.400000002235,
+        "comprehension": {
+          "correct": 7,
+          "total": 7,
+          "answered": 7,
+          "fact": {
+            "correct": 5,
+            "total": 5,
+            "answered": 5
+          },
+          "inference": {
+            "correct": 2,
+            "total": 2,
+            "answered": 2
+          }
+        },
+        "diagnostic": {
+          "readingMs": 117.69999999925494,
+          "skipped": false,
+          "answered": true,
+          "correct": 4,
+          "total": 4
+        },
+        "totalScore": 100,
+        "totalCorrect": 9
+      },
+      "remainingTasks": [
+        "reading-content-3",
+        "reading-content-4",
+        "reading-content-5",
+        "reading-content-6",
+        "reading-content-7",
+        "reading-outline",
+        "reading-summary"
+      ]
+    },
+    {
+      "name": "width-768",
+      "geometry": {
+        "reference": {
+          "x": 32,
+          "y": 377.390625,
+          "width": 340,
+          "right": 372
+        },
+        "question": {
+          "x": 396,
+          "y": 377.390625,
+          "width": 340,
+          "right": 736
+        },
+        "paragraphs": 4,
+        "overflow": false,
+        "independentScroll": "auto",
+        "clientHeight": 585,
+        "scrollHeight": 1710,
+        "open": true
+      },
+      "completed": true,
+      "score": {
+        "correct": 9,
+        "totalQuestions": 9,
+        "wrong": 0,
+        "accuracy": 100,
+        "answered": 9,
+        "mistakes": [],
+        "reviewAttempts": 0,
+        "reviewCorrect": 0,
+        "elapsedMs": 1942.2999999970198,
+        "comprehension": {
+          "correct": 7,
+          "total": 7,
+          "answered": 7,
+          "fact": {
+            "correct": 5,
+            "total": 5,
+            "answered": 5
+          },
+          "inference": {
+            "correct": 2,
+            "total": 2,
+            "answered": 2
+          }
+        },
+        "diagnostic": {
+          "readingMs": 113.89999999850988,
+          "skipped": false,
+          "answered": true,
+          "correct": 4,
+          "total": 4
+        },
+        "totalScore": 100,
+        "totalCorrect": 9
+      },
+      "remainingTasks": [
+        "reading-content-1",
+        "reading-content-2",
+        "reading-content-3",
+        "reading-content-4",
+        "reading-content-5",
+        "reading-content-6",
+        "reading-content-7",
+        "reading-outline",
+        "reading-summary"
+      ]
+    }
+  ],
+  "consoleErrors": [],
+  "failedRequests": [],
+  "browser": "154.0.8037.98",
+  "passed": true
+}

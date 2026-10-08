@@ -2,9 +2,9 @@
 (() => {
   const app = document.querySelector('.app');
   const AREA = {
-    fluency: { label: '읽기 유창성', steps: [3], short: '읽기·진단' },
+    fluency: { label: '읽기 유창성', homeLabel: '지문 1', steps: [3], short: '읽기·진단' },
     vocabulary: { label: '어휘력', steps: [1], short: '어휘' },
-    reading: { label: '독해력', steps: [2, 3, 4], short: '개념·인출 · 읽기·진단 · 구조화·글쓰기' }
+    reading: { label: '독해력', homeLabel: '지문 2', steps: [2, 3, 4], short: '개념·인출 · 읽기·진단 · 구조화·글쓰기' }
   };
   let view = 'learning';
   let drawerReturnFocus = null;
@@ -12,12 +12,15 @@
   const areaActive = () => window.AreaTraining?.hasActive() || false;
   const resultOf = record => record.activity ? window.AreaTraining.results(record.session) : deriveResults(record.session);
   const openRecord = record => record.activity ? window.AreaTraining.showReport(record.session) : showHistoryReport(record);
-  const dateKey = value => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(value));
-  const dayLabel = value => new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(value));
+  const dateFormatter = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' });
+  const labelFormatter = new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' });
+  const dateKey = value => dateFormatter.format(new Date(value));
+  const dayLabel = value => labelFormatter.format(new Date(value));
   const meaningful = () => S.status === 'active' && (S.elapsedMs >= 1000 || S.currentStep !== S.requiredSteps[0] || S.mode === 'mistakes' || Object.values(S.submitted).some(Boolean) || S.phase.concept !== 'read' || S.phase.reading !== 'read' || S.draft.vocab.some(x => x !== null) || S.draft.compose.some(Boolean) || S.draft.blanks.some(Boolean) || S.draft.readingAnswers.some(x => x !== null) || S.draft.key.length || S.draft.slots.some(x => x.length) || S.draft.essay);
 
-  function setView(next) {
+  function setView(next, records) {
     window.AreaTraining?.pause();
+    const changed = view !== next;
     view = next; app.dataset.view = next;
     if ($('activity-panel')) $('activity-panel').hidden = true;
     document.title = next === 'home' ? '맞춤형 훈련 · 읽는 힘' : next === 'history' ? '학습 기록 · 읽는 힘' : next === 'report' ? '학습 리포트 · 읽는 힘' : `${S.title} · ${AREA[currentArea()].label}`;
@@ -30,7 +33,7 @@
     $('view-context').textContent = next === 'history' ? '학습 기록' : '학습 리포트';
     app.dataset.area = currentArea();
     document.querySelector('.actionbar').dataset.area = app.dataset.area;
-    refreshMenu();
+    if (changed) refreshMenu(records);
   }
   function currentArea() {
     if (S.mode === 'area' && S.requiredSteps.length > 1) return 'reading';
@@ -46,13 +49,16 @@
   function todayStatus(records) {
     const today = dateKey(Date.now());
     const submitted = new Set();
-    records.filter(record => dateKey(record.completedAt) === today && record.mode !== 'mistakes' && !record.activity).forEach(record => {
-      record.session.requiredSteps.forEach(step => { if (stepDone(record.session, step)) submitted.add(step); });
-    });
-    return Object.fromEntries(Object.entries(AREA).map(([key, area]) => [key, area.steps.every(step => submitted.has(step)) || records.some(record => record.activity && record.session.area === key && !record.session.reviewOf && dateKey(record.completedAt) === today)]));
+    const completedAreas = new Set();
+    for (const record of records) {
+      if (record.mode === 'mistakes' || (record.activity && record.session.reviewOf) || dateKey(record.completedAt) !== today) continue;
+      if (record.activity) (window.AreaTraining.completedAreas?.(record.session) || [record.session.area]).forEach(area => completedAreas.add(area));
+      else record.session.requiredSteps.forEach(step => { if (stepDone(record.session, step)) submitted.add(step); });
+    }
+    return Object.fromEntries(Object.entries(AREA).map(([key, area]) => [key, completedAreas.has(key) || area.steps.every(step => submitted.has(step))]));
   }
   function recordArea(record) {
-    if (record.activity) return { key: record.session.area, label: AREA[record.session.area].label + (record.session.reviewOf ? ' · 오답 복습' : '') };
+    if (record.activity) return { key: window.AreaTraining.areaOf?.(record.session) || record.session.area, label: (window.AreaTraining.label?.(record.session) || AREA[record.session.area].label) + (record.session.reviewOf ? ' · 오답 복습' : '') };
     if (record.mode === 'mistakes') return { key: 'reading', label: '오답 재학습' };
     if (record.session.requiredSteps.length === 1) {
       const step = record.session.requiredSteps[0];
@@ -61,31 +67,32 @@
     return { key: 'reading', label: record.mode === 'full' ? '전체 학습' : '독해력' };
   }
   function recordCard(record) {
-    const area = recordArea(record), result = resultOf(record);
+    const area = recordArea(record), result = resultOf(record), date = dayLabel(record.completedAt);
     const card = el('article', 'record-card'); card.dataset.area = area.key;
-    card.innerHTML = `<div class="record-main"><span class="record-area">${esc(area.label)}</span><h3>${esc(record.title)}</h3><span class="record-meta">${esc(dayLabel(record.completedAt))} · ${esc(formatTime(record.totalTime))}</span></div><div class="record-score"><strong>${result.totalScore ?? '—'}<small>%</small></strong><span>정답률</span></div>`;
+    card.innerHTML = `<div class="record-main"><span class="record-area">${esc(area.label)}</span><h3>${esc(record.title)}</h3><span class="record-meta">${esc(date)} · ${esc(formatTime(record.totalTime))}</span></div><div class="record-score"><strong>${result.totalScore ?? '—'}<small>%</small></strong><span>정답률</span></div>`;
     const button = el('button', 'icon-button', '→');
-    button.setAttribute('aria-label', `${area.label} ${dayLabel(record.completedAt)} 결과 보기`);
+    button.setAttribute('aria-label', `${area.label} ${date} 결과 보기`);
     button.onclick = () => openRecord(record); card.append(button);
     return card;
   }
-  function renderHome() {
-    const records = history().sort((a, b) => b.completedAt.localeCompare(a.completedAt));
+  function renderHome(records = history()) {
+    records.sort((a, b) => b.completedAt.localeCompare(a.completedAt));
     const done = todayStatus(records), count = Object.values(done).filter(Boolean).length;
     $('home-time').textContent = formatTime(totalLearningTime(records));
     $('today-count').innerHTML = `${count} <span>/ 3 완료</span>`;
     $('today-progress').value = count;
     $('today-checklist').replaceChildren();
     Object.entries(AREA).forEach(([key, area]) => {
+      const homeLabel = area.homeLabel || area.label;
       const item = el('span', 'today-item' + (done[key] ? ' is-complete' : ''));
       item.dataset.area = key;
-      item.innerHTML = `<span aria-hidden="true">${done[key] ? '✓' : '○'}</span> ${area.label}<small>${done[key] ? '완료' : '진행 전'}</small>`;
+      item.innerHTML = `<span aria-hidden="true">${done[key] ? '✓' : '○'}</span> ${homeLabel}<small>${done[key] ? '완료' : '진행 전'}</small>`;
       $('today-checklist').append(item);
-      const continuing = window.AreaTraining ? areaActive() && window.AreaTraining.getSession().area === key : meaningful() && area.steps.every(step => S.requiredSteps.includes(step));
+      const continuing = window.AreaTraining ? areaActive() && !window.AreaTraining.hasPreviousFlow?.() && (window.AreaTraining.currentArea?.() || window.AreaTraining.getSession().area) === key : meaningful() && area.steps.every(step => S.requiredSteps.includes(step));
       $('card-' + key + '-status').textContent = done[key] ? '✓ 오늘 완료' : continuing ? '진행 중' : '진행 전';
       const actionLabel = continuing ? '이어하기' : done[key] ? '다시 학습하기' : '시작하기';
       $('start-' + key).innerHTML = `${actionLabel} <span aria-hidden="true">→</span>`;
-      $('start-' + key).setAttribute('aria-label', `${area.label} ${actionLabel}`);
+      $('start-' + key).setAttribute('aria-label', `${homeLabel} ${actionLabel}`);
     });
     $('today-message').textContent = count === 3 ? '오늘의 세 영역을 모두 완료했어요. 수고했어요!' : '완료한 회차가 오늘의 진행도에 반영돼요.';
     $('home-resume').hidden = !meaningful() && !areaActive();
@@ -96,19 +103,24 @@
     const recent = $('recent-list'); recent.replaceChildren();
     if (!records.length) {
       const empty = el('div', 'empty-state', '<span class="empty-symbol" aria-hidden="true">↗</span><h3>아직 완료한 학습이 없어요.</h3><p>첫 학습을 마치면 나의 기록이 여기에 쌓여요.</p>');
-      const start = el('button', 'btn secondary', '첫 학습 시작하기'); start.id = 'home-first-start'; start.onclick = () => window.AreaTraining ? window.AreaTraining.start('fluency') : startFull(); empty.append(start); recent.append(empty);
+      const start = el('button', 'btn secondary', '첫 학습 시작하기'); start.id = 'home-first-start'; start.onclick = startFull; empty.append(start); recent.append(empty);
     } else records.slice(0, 3).forEach(record => recent.append(recordCard(record)));
   }
   function home(focus = true) {
     window.AreaTraining?.pause();
     tick(); persist();
     gateOpen = false; historyOpen = false; viewingRecord = null;
-    $('resume-dialog').close(); setView('home'); renderHome();
+    const records = history();
+    $('resume-dialog').close(); setView('home', records); renderHome(records);
     lastTick = performance.now(); window.scrollTo({ top: 0 });
     if (focus) $('home-title').focus({ preventScroll: true });
   }
   function continueLearning() { if (areaActive()) { window.AreaTraining.resume(); return; } historyOpen = false; viewingRecord = null; resume(); }
   function startFull() {
+    if (window.AreaTraining?.startCourse) { window.AreaTraining.startCourse(); return; }
+    startLegacy();
+  }
+  function startLegacy() {
     if (meaningful() && S.mode === 'full') { historyOpen = false; viewingRecord = null; resume(); return; }
     startEntry([1, 2, 3, 4], 'full');
   }
@@ -219,9 +231,9 @@
     const areas = report.querySelector('.areas');
     if (areas) { const details = el('details', 'report-details'); details.append(el('summary', '', '영역별 상세 결과 보기')); areas.before(details); details.append(areas); }
   }
-  function refreshMenu() {
+  function refreshMenu(records) {
     $('menu-continue').hidden = !meaningful() && !areaActive();
-    $('menu-report').hidden = S.status !== 'completed' && !history().length;
+    $('menu-report').hidden = S.status !== 'completed' && !(records || history()).length;
     document.querySelectorAll('[data-menu]').forEach(button => {
       if (button.dataset.menu === view || button.dataset.menu === 'continue' && view === 'learning') button.setAttribute('aria-current', 'page'); else button.removeAttribute('aria-current');
     });
@@ -272,8 +284,20 @@
   $('brand-home').onclick = () => home(); $('learning-home').onclick = () => home(); $('view-home').onclick = () => home();
   $('home-continue').onclick = continueLearning; $('home-full-start').onclick = startFull;
   $('home-history-all').onclick = showHistory;
-  Object.entries(AREA).forEach(([key, area]) => { $('start-' + key).onclick = () => window.AreaTraining ? window.AreaTraining.start(key) : startEntry(area.steps); });
-  $('menu-button').onclick = () => { tick(); persist(); refreshMenu(); drawerReturnFocus = document.activeElement; $('menu-drawer').showModal(); $('menu-button').setAttribute('aria-expanded', 'true'); document.body.classList.add('menu-open'); };
+  Object.entries(AREA).forEach(([key, area]) => { $('start-' + key).onclick = () => {
+    if (!window.AreaTraining) { startEntry(area.steps); return; }
+    if (key === 'fluency' && window.AreaTraining.startFluency) {
+      if (areaActive() && window.AreaTraining.isCurrentCourse?.() && window.AreaTraining.currentArea() === key) window.AreaTraining.resume();
+      else window.AreaTraining.startFluency();
+      return;
+    }
+    if (areaActive() && window.AreaTraining.currentArea?.() === key) { window.AreaTraining.resume(); return; }
+    if (key === 'vocabulary' && window.AreaTraining.startVocabulary) window.AreaTraining.startVocabulary();
+    else if (key === 'reading' && window.AreaTraining.startReading) window.AreaTraining.startReading();
+    else window.AreaTraining.start(key);
+  }; });
+  if ($('menu-legacy')) $('menu-legacy').onclick = () => { closeMenu(); startLegacy(); };
+  $('menu-button').onclick = () => { window.AreaTraining?.pause(); tick(); persist(); refreshMenu(); drawerReturnFocus = document.activeElement; $('menu-drawer').showModal(); $('menu-button').setAttribute('aria-expanded', 'true'); document.body.classList.add('menu-open'); };
   $('menu-close').onclick = closeMenu;
   $('menu-drawer').addEventListener('cancel', event => { event.preventDefault(); closeMenu(); });
   $('menu-drawer').addEventListener('keydown', event => {

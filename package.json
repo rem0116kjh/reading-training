@@ -7,14 +7,17 @@
   },
   "scripts": {
     "test": "node --test tests/*.test.cjs",
-    "start": "python3 -m http.server 4173 --bind 127.0.0.1",
-    "check": "node --check app.js && node --check session-ui.js && node --check training-store.js && node --check feedback.js && node --check interface.js && node --check activity-content.js && node --check activity-engine.js && node --check activity-ui.js",
-    "build": "python3 scripts/build.py"
+    "start": "python3 scripts/serve.py",
+    "check": "node --check app.js && node --check session-ui.js && node --check training-store.js && node --check feedback.js && node --check interface.js && node --check reading-comprehension.js && node --check reading-flow.js && node --check reading-diagnostic.js && node --check activity-content.js && node --check fluency-content.js && node --check vocabulary-content.js && node --check reading-content.js && node --check fluency-concept-content.js && node --check activity-engine.js && node --check activity-ui.js",
+    "build": "python3 scripts/build.py",
+    "benchmark": "node scripts/benchmark-runtime.cjs",
+    "test:browser": "node scripts/test-reading-browser.cjs"
   },
   "keywords": [],
   "author": "",
   "type": "commonjs",
   "devDependencies": {
+    "esbuild": "0.28.2",
     "jsdom": "30.1.2"
   },
   "private": true

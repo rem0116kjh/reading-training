@@ -10,6 +10,37 @@ class MemoryStorage {
   setItem(key, value) { this.values.set(key, String(value)); }
 }
 
+test('unchanged saves avoid writes, observe external changes, and retry genuine quota failures', () => {
+  const storage = new MemoryStorage(), writes = [];
+  let blocked = false;
+  storage.setItem = (key, value) => {
+    if (blocked) throw new Error('QuotaExceededError');
+    writes.push(key); storage.values.set(key, String(value));
+  };
+  const session = fresh();
+  assert.equal(engine.save(storage, session).ok, true);
+  assert.equal(engine.save(storage, session).ok, true);
+  assert.deepEqual(writes, [ActivityEngine.SESSION_KEY]);
+  engine.tick(session, 1000); blocked = true;
+  assert.equal(engine.save(storage, session).ok, false);
+  blocked = false; assert.equal(engine.save(storage, session).ok, true);
+  storage.values.delete(ActivityEngine.SESSION_KEY);
+  assert.equal(engine.save(storage, session).ok, true);
+  const completed = finish(session);
+  assert.equal(engine.saveCompleted(storage, completed).ok, true);
+  const saved = storage.getItem(ActivityEngine.HISTORY_KEY), count = writes.length;
+  blocked = true;
+  assert.equal(engine.saveCompleted(storage, completed).ok, true, 'a durable identical record needs no new write');
+  assert.equal(writes.length, count);
+  storage.values.set(ActivityEngine.HISTORY_KEY, 'broken');
+  assert.equal(engine.saveCompleted(storage, completed).ok, false, 'external corruption cannot be hidden by a cache');
+  assert.equal(storage.getItem(ActivityEngine.HISTORY_KEY), 'broken');
+  storage.values.set(ActivityEngine.HISTORY_KEY, saved); blocked = false;
+  const other = finish(fresh('reading', { id: 'another-session' }));
+  assert.equal(engine.saveCompleted(storage, other).ok, true);
+  assert.equal(engine.loadHistory(storage).records.length, 2);
+});
+
 const choice = (id, phase = '뜻 맞추기') => ({ id, kind: 'choice', phase, title: id, options: ['가', '나', '다'], answer: 1 });
 const read = (id, mode = 'normal') => ({ id, kind: 'read', mode, sentences: ['소금을 읽어요.', '내용을 확인해요.'] });
 const catalog = {
