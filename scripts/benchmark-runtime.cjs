@@ -47,7 +47,7 @@ function measure(name, action) {
 }
 try {
   measure('home-30s', () => advance(30000));
-  click('start-fluency');
+  window.AreaTraining.startFluency();
   measure('before-reading-start-30s', () => advance(30000));
   click('activity-main');
   measure('tap-reading-10s', () => advance(10000));

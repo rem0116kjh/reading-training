@@ -50,22 +50,15 @@
 
 ## 레이아웃
 
-| 화면 | 폭 | 홈 훈련 카드 |
-| --- | --- | --- |
-| 작은 모바일 | 359px 이하 | 왼쪽 47% / 오른쪽 53%, 간격 10px |
-| 모바일 | 360–639px | 왼쪽 44% / 오른쪽 56%, 간격 12px |
-| 태블릿 | 640–1023px | 왼쪽 40% / 오른쪽 60%, 간격 20px |
-| 데스크톱 | 1024px 이상 | 왼쪽 40% / 오른쪽 60%, 간격 24px |
-
-모든 화면에서 왼쪽 위는 읽기 유창성, 왼쪽 아래는 어휘력, 오른쪽 두 행 전체는 독해력입니다. 두 행의 기본 비율은 1.15:1이며 콘텐츠의 최소 높이를 보장합니다. 고정 높이나 강제 종횡비로 글자를 자르지 않습니다. HTML과 키보드 탐색 순서는 읽기 유창성 → 어휘력 → 독해력으로 유지합니다.
+홈에는 **맞춤형 훈련 시작** 버튼이 있는 하나의 훈련 카드를 표시합니다. 카드 안의 단계 안내는 어휘력 → 지문 1 → 지문 2 순서이며 개별 시작 버튼을 두지 않습니다. 639px 이하에서는 세 단계 안내를 세로로, 640px 이상에서는 세 열로 표시합니다. 학습 중에는 같은 버튼이 **맞춤형 훈련 이어하기**로 바뀌고 저장된 회차를 이어갑니다.
 
 전체 컨테이너는 최대 1160px로 중앙 정렬합니다. 학습 화면은 최대 920px입니다. 큰 지문은 자체 카드 안에 들어갑니다. 매우 작은 화면에서는 입력과 동작을 줄바꿈하며, 긴 사용자 답안에는 강제 넘침 방지를 적용합니다.
 
 ## 컴포넌트 계약
 
 - 공통 헤더: `.site-header`, `.site-brand`, `.brand-caption`, `.site-header-actions`, `.icon-button`, `.text-button`. 브랜드는 별도 장식 마크 없이 서비스 이름으로 표시합니다.
-- 홈: `.home-welcome`, `.today-card`, `.resume-card`, `.training-grid`, `.training-card`, `.recent-list`, `.record-card`, `.empty-state`
-- 훈련 카드 버튼: `.training-card-button`; 내부 SVG는 `currentColor` 사용 가능
+- 홈: `.home-welcome`, `.today-card`, `.resume-card`, `.course-start-card`, `.course-stage-list`, `.recent-list`, `.record-card`, `.empty-state`
+- 훈련 시작 버튼: `#home-full-start.course-start-button`; 전체 과정 시작·이어하기를 연결
 - 오늘 완료 항목: `.today-item.is-complete` 또는 `.today-item[data-complete="true"]`
 - 메뉴: `dialog#menu-drawer`; 현재 메뉴는 `aria-current="page"`
 - 학습: 기존 `.top`, `.rail`, `.q`, `.opt`, `.passage`, `.slots`, `.actionbar` 유지

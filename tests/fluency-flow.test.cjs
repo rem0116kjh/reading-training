@@ -55,6 +55,8 @@ function openApp(t, stored = {}) {
   assert.ok(window.AreaTraining, 'real entry point loads AreaTraining');
   return {
     window, document, get, click,
+    // Isolated area fixtures exercise the retained engine APIs; home starts the full course.
+    startArea: area => window.AreaTraining[{ vocabulary: 'startVocabulary', fluency: 'startFluency', reading: 'startReading' }[area]](),
     main: () => click('#activity-main'),
     session: () => json(window.AreaTraining.getSession()),
     records: () => json(window.AreaTraining.records()),
@@ -115,7 +117,7 @@ function readConceptStage(app) {
 }
 
 test('home passage one runs stage 1 -> stage 2 -> five final blanks without intermediate questions', t => {
-  const app = openApp(t); app.click('#start-fluency');
+  const app = openApp(t); app.startArea('fluency');
   assert.equal(app.session().area, 'fluencyConceptV2');
   assert.match(app.current().task.source, /중심 문장을 자세히 설명하거나 예를 드는 문장은 뒷받침 문장/);
   readConceptStage(app);
@@ -131,7 +133,7 @@ test('home passage one runs stage 1 -> stage 2 -> five final blanks without inte
 });
 
 test('concept blank text and confidence survive reload, cannot submit early and produce per-blank feedback before continuing', t => {
-  let app = openApp(t); app.click('#start-fluency'); app.click('#activity-skip-read');
+  let app = openApp(t); app.startArea('fluency'); app.click('#activity-skip-read');
   assert.equal(app.current().task.stage, 2); app.click('#activity-skip-read');
   assert.equal(app.current().task.kind, 'cloze');
   app.input('#fluency-cloze-answer-0', '중심문장'); app.input('#fluency-cloze-confidence-0', 'sure');
@@ -162,27 +164,69 @@ test('new full course keeps vocabulary and passage three while its fluency conta
   const restored = openApp(t, app.snapshot()); assert.deepEqual(restored.records(), app.records());
 });
 
+test('one home entry runs all three stages in order and resumes the same course after reloading each stage', t => {
+  let app = openApp(t); app.click('#home-full-start');
+  const id = app.session().id, stages = [];
+  const labels = ['1단계 · 어휘력', '2단계 · 지문 1', '3단계 · 지문 2'];
+  for (let guard = 0; guard < 80 && app.session().status === 'active'; guard++) {
+    const area = app.window.AreaTraining.currentArea();
+    if (stages.at(-1) !== area) {
+      stages.push(area);
+      assert.equal(app.get('.course-steps [aria-current="step"]').textContent, labels[stages.length - 1]);
+      app.click('#activity-home');
+      assert.match(app.get('#home-full-start').textContent, /맞춤형 훈련 이어하기/);
+      assert.equal(app.get('#course-status').textContent, `${stages.length}단계 진행 중`);
+      const saved = app.session();
+      app = openApp(t, app.snapshot()); app.click('#home-full-start');
+      assert.equal(app.get('#confirm-dialog').open, false);
+      assert.deepEqual(app.session(), saved, 'unified resume preserves answers, cursor and reading progress');
+    }
+    assert.equal(app.session().id, id);
+    const { task } = app.current();
+    if (task.kind === 'read') app.click('#activity-skip-read');
+    else if (task.kind === 'practice') {
+      app.input('#vocabulary-compose-0', '소금이 단단하게 굳었어요.');
+      app.input('#vocabulary-compose-1', '소금은 중요한 역할을 해요.');
+      app.main(); app.main();
+    } else if (task.kind === 'summary') {
+      app.input('#reading-summary-answer', task.source); app.main(); app.main();
+    } else question(app);
+  }
+  assert.deepEqual(stages, ['vocabulary', 'fluency', 'reading']);
+  assert.equal(app.session().status, 'completed');
+  assert.equal(app.results().totalQuestions, 19);
+  assert.equal(app.results().accuracy, 100);
+  assert.equal(app.records().length, 1);
+  const record = app.records()[0];
+  app.click('#activity-home'); assert.equal(app.get('#today-progress').value, 3);
+  assert.match(app.get('#home-full-start').textContent, /맞춤형 훈련 시작/);
+  app.click('#home-full-start');
+  assert.notEqual(app.session().id, id);
+  assert.equal(app.window.AreaTraining.currentArea(), 'vocabulary');
+  assert.deepEqual(app.records(), [record], 'new course keeps the completed record');
+});
+
 test('switching an older fluency session to the new home entry asks before replacement and cancellation preserves its answers', t => {
   const app = openApp(t); app.window.AreaTraining.start('fluencyIntegratedV1');
   app.click('#activity-skip-read'); app.click('#activity-option-2');
-  const original = app.session(); app.click('#activity-home'); app.click('#start-fluency');
+  const original = app.session(); app.click('#activity-home'); app.click('#home-full-start');
   assert.equal(app.get('#confirm-dialog').open, true); app.click('#confirm-no');
   assert.deepEqual(app.session(), original);
-  app.click('#start-fluency'); app.click('#confirm-yes');
-  assert.equal(app.session().area, 'fluencyConceptV2'); assert.equal(app.current().task.stage, 1);
+  app.click('#home-full-start'); app.click('#confirm-yes');
+  assert.equal(app.session().area, 'courseDiagnosticV3'); assert.equal(app.window.AreaTraining.currentArea(), 'vocabulary');
 });
 
-test('previous concept session reloads its intermediate cloze and changing to the consecutive reads requires confirmation', t => {
+test('previous concept session reloads its cloze and the unified course confirms replacement', t => {
   let app = openApp(t); app.window.AreaTraining.start('fluencyConceptV1');
   app.click('#activity-skip-read'); app.input('#fluency-cloze-answer-0', '중심 문장');
   const original = app.session(); app = openApp(t, app.snapshot()); app.click('#home-continue');
   assert.deepEqual(app.session(), original); assert.equal(app.current().task.quizStage, 1);
   assert.equal(app.get('#fluency-cloze-answer-0').value, '중심 문장');
-  app.click('#activity-home'); app.click('#start-fluency');
+  app.click('#activity-home'); app.click('#home-full-start');
   assert.equal(app.get('#confirm-dialog').open, true); app.click('#confirm-no');
   assert.deepEqual(app.session(), original);
-  app.click('#start-fluency'); app.click('#confirm-yes');
-  assert.equal(app.session().area, 'fluencyConceptV2'); assert.equal(app.current().task.stage, 1);
+  app.click('#home-full-start'); app.click('#confirm-yes');
+  assert.equal(app.session().area, 'courseDiagnosticV3'); assert.equal(app.window.AreaTraining.currentArea(), 'vocabulary');
 });
 function readStage(app) {
   const {task,entry}=app.current();
@@ -348,7 +392,7 @@ test('blank and multiple-choice drafts restore; corrected review creates one imm
 test('full course card resume and legacy draft coexist without replacement; failed new result persistence stays recoverable', t=>{
   const app=openApp(t); app.click('#menu-button'); app.click('#menu-legacy');
   app.input('#comp0','소금이 단단하게 굳어요.'); const legacy=app.legacy(); app.click('#learning-home');
-  app.window.AreaTraining.start('courseReadingReadinV2'); app.main(); app.click('#activity-option-1'); const course=app.session(); app.click('#activity-home'); app.click('#start-vocabulary');
+  app.window.AreaTraining.start('courseReadingReadinV2'); app.main(); app.click('#activity-option-1'); const course=app.session(); app.click('#activity-home'); app.click('#home-full-start');
   assert.equal(app.session().id,course.id); assert.deepEqual(app.legacy().draft,legacy.draft);
   app.click('#activity-home'); app.click('#menu-button'); app.click('#menu-legacy'); assert.equal(app.get('#comp0').value,legacy.draft.compose[0]);
   app.click('#learning-home'); app.window.AreaTraining.start('courseReadingReadinV2');

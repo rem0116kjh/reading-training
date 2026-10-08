@@ -2,8 +2,8 @@
 (() => {
   const app = document.querySelector('.app');
   const AREA = {
-    fluency: { label: '읽기 유창성', homeLabel: '지문 1', steps: [3], short: '읽기·진단' },
     vocabulary: { label: '어휘력', steps: [1], short: '어휘' },
+    fluency: { label: '읽기 유창성', homeLabel: '지문 1', steps: [3], short: '읽기·진단' },
     reading: { label: '독해력', homeLabel: '지문 2', steps: [2, 3, 4], short: '개념·인출 · 읽기·진단 · 구조화·글쓰기' }
   };
   let view = 'learning';
@@ -17,6 +17,7 @@
   const dateKey = value => dateFormatter.format(new Date(value));
   const dayLabel = value => labelFormatter.format(new Date(value));
   const meaningful = () => S.status === 'active' && (S.elapsedMs >= 1000 || S.currentStep !== S.requiredSteps[0] || S.mode === 'mistakes' || Object.values(S.submitted).some(Boolean) || S.phase.concept !== 'read' || S.phase.reading !== 'read' || S.draft.vocab.some(x => x !== null) || S.draft.compose.some(Boolean) || S.draft.blanks.some(Boolean) || S.draft.readingAnswers.some(x => x !== null) || S.draft.key.length || S.draft.slots.some(x => x.length) || S.draft.essay);
+  const courseActive = () => window.AreaTraining ? areaActive() && window.AreaTraining.isCourse() : meaningful() && S.mode === 'full';
 
   function setView(next, records) {
     window.AreaTraining?.pause();
@@ -88,13 +89,13 @@
       item.dataset.area = key;
       item.innerHTML = `<span aria-hidden="true">${done[key] ? '✓' : '○'}</span> ${homeLabel}<small>${done[key] ? '완료' : '진행 전'}</small>`;
       $('today-checklist').append(item);
-      const continuing = window.AreaTraining ? areaActive() && !window.AreaTraining.hasPreviousFlow?.() && (window.AreaTraining.currentArea?.() || window.AreaTraining.getSession().area) === key : meaningful() && area.steps.every(step => S.requiredSteps.includes(step));
-      $('card-' + key + '-status').textContent = done[key] ? '✓ 오늘 완료' : continuing ? '진행 중' : '진행 전';
-      const actionLabel = continuing ? '이어하기' : done[key] ? '다시 학습하기' : '시작하기';
-      $('start-' + key).innerHTML = `${actionLabel} <span aria-hidden="true">→</span>`;
-      $('start-' + key).setAttribute('aria-label', `${homeLabel} ${actionLabel}`);
     });
-    $('today-message').textContent = count === 3 ? '오늘의 세 영역을 모두 완료했어요. 수고했어요!' : '완료한 회차가 오늘의 진행도에 반영돼요.';
+    const continuing = courseActive();
+    const stage = Object.keys(AREA).indexOf(window.AreaTraining?.currentArea() || currentArea()) + 1;
+    $('course-status').textContent = continuing ? `${stage}단계 진행 중` : '3단계 과정';
+    $('home-full-start').innerHTML = `맞춤형 훈련 ${continuing ? '이어하기' : '시작'} <span aria-hidden="true">→</span>`;
+    $('course-start-detail').textContent = continuing ? '학습 중이던 단계에서 이어서 진행해요.' : '중간에 멈춰도 이어서 학습할 수 있어요.';
+    $('today-message').textContent = count === 3 ? '오늘의 세 단계를 모두 완료했어요. 수고했어요!' : '완료한 회차가 오늘의 진행도에 반영돼요.';
     $('home-resume').hidden = !meaningful() && !areaActive();
     $('home-resume-title').textContent = S.title;
     $('home-resume-description').textContent = `${S.mode === 'mistakes' ? '오답 재학습' : STEP_NAMES[S.currentStep - 1]} · ${progress(S)}% 완료 · ${formatTime(S.elapsedMs)}`;
@@ -103,7 +104,7 @@
     const recent = $('recent-list'); recent.replaceChildren();
     if (!records.length) {
       const empty = el('div', 'empty-state', '<span class="empty-symbol" aria-hidden="true">↗</span><h3>아직 완료한 학습이 없어요.</h3><p>첫 학습을 마치면 나의 기록이 여기에 쌓여요.</p>');
-      const start = el('button', 'btn secondary', '첫 학습 시작하기'); start.id = 'home-first-start'; start.onclick = startFull; empty.append(start); recent.append(empty);
+      recent.append(empty);
     } else records.slice(0, 3).forEach(record => recent.append(recordCard(record)));
   }
   function home(focus = true) {
@@ -117,6 +118,7 @@
   }
   function continueLearning() { if (areaActive()) { window.AreaTraining.resume(); return; } historyOpen = false; viewingRecord = null; resume(); }
   function startFull() {
+    if (courseActive()) { continueLearning(); return; }
     if (window.AreaTraining?.startCourse) { window.AreaTraining.startCourse(); return; }
     startLegacy();
   }
@@ -284,18 +286,6 @@
   $('brand-home').onclick = () => home(); $('learning-home').onclick = () => home(); $('view-home').onclick = () => home();
   $('home-continue').onclick = continueLearning; $('home-full-start').onclick = startFull;
   $('home-history-all').onclick = showHistory;
-  Object.entries(AREA).forEach(([key, area]) => { $('start-' + key).onclick = () => {
-    if (!window.AreaTraining) { startEntry(area.steps); return; }
-    if (key === 'fluency' && window.AreaTraining.startFluency) {
-      if (areaActive() && window.AreaTraining.isCurrentCourse?.() && window.AreaTraining.currentArea() === key) window.AreaTraining.resume();
-      else window.AreaTraining.startFluency();
-      return;
-    }
-    if (areaActive() && window.AreaTraining.currentArea?.() === key) { window.AreaTraining.resume(); return; }
-    if (key === 'vocabulary' && window.AreaTraining.startVocabulary) window.AreaTraining.startVocabulary();
-    else if (key === 'reading' && window.AreaTraining.startReading) window.AreaTraining.startReading();
-    else window.AreaTraining.start(key);
-  }; });
   if ($('menu-legacy')) $('menu-legacy').onclick = () => { closeMenu(); startLegacy(); };
   $('menu-button').onclick = () => { window.AreaTraining?.pause(); tick(); persist(); refreshMenu(); drawerReturnFocus = document.activeElement; $('menu-drawer').showModal(); $('menu-button').setAttribute('aria-expanded', 'true'); document.body.classList.add('menu-open'); };
   $('menu-close').onclick = closeMenu;

@@ -57,6 +57,8 @@ function openApp(t, stored = {}) {
   assert.ok(window.AreaTraining, 'real entry point loads AreaTraining');
   return {
     window, document, get, click,
+    // Isolated area fixtures exercise the retained engine APIs; home starts the full course.
+    startArea: area => window.AreaTraining[{ vocabulary: 'startVocabulary', fluency: 'startFluency', reading: 'startReading' }[area]](),
     main: () => click('#activity-main'),
     session: () => json(window.AreaTraining.getSession()),
     records: () => json(window.AreaTraining.records()),
@@ -88,7 +90,7 @@ function hidden(app, selector) { assert.ok(app.get(selector).closest('[hidden]')
 test('idle home, pre-start reading, paused menus and hidden tabs avoid timer writes while active time remains durable', t => {
   const app = openApp(t);
   app.advance(30000); assert.deepEqual(app.takeWrites(), []);
-  app.click('#start-fluency'); app.takeWrites();
+  app.startArea('fluency'); app.takeWrites();
   const observer = new app.window.MutationObserver(() => {});
   observer.observe(app.get('#activity-panel'), { subtree: true, childList: true, attributes: true });
   app.advance(30000);
@@ -160,14 +162,14 @@ function finishArea(app, wrongTask = null) {
   return seen;
 }
 
-test('real entry point keeps home and starts all three distinct area activities', t => {
+test('isolated area APIs preserve the three existing activities and legacy drafts', t => {
   for (const [area, kind, firstTask] of [
     ['fluency', 'read', 'salt-concept-v2-stage-1'],
     ['vocabulary', 'choice', 'salt-vocabulary-original-1'],
     ['reading', 'read', 'reading-passage']
   ]) {
     const app = openApp(t); visible(app, '#home-panel');
-    const old = app.legacy(); app.click(`#start-${area}`);
+    const old = app.legacy(); app.startArea(area);
     visible(app, '#activity-panel'); hidden(app, '#home-panel'); hidden(app, '#learning-shell');
     assert.equal(app.session().area, area === 'fluency' ? 'fluencyConceptV2' : area === 'vocabulary' ? 'vocabularyReadinV1' : 'readingDiagnosticV3');
     assert.equal(app.current().task.id, firstTask); assert.equal(app.current().task.kind, kind);
@@ -177,7 +179,7 @@ test('real entry point keeps home and starts all three distinct area activities'
 });
 
 test('word cards reveal the original meaning and example, count unique views, and preserve quiz state', t => {
-  const app = openApp(t); app.click('#start-vocabulary');
+  const app = openApp(t); app.startArea('vocabulary');
   assert.equal(app.get('#activity-title').textContent, '오늘의 단어');
   assert.equal(app.document.querySelectorAll('.vocabulary-card').length, 10);
   const original = app.session();
@@ -223,7 +225,7 @@ test('word preview resumes before answering and never charges card time as quest
 });
 
 test('vocabulary finishes exactly five quizzes before unchanged saved writing and optional review', t => {
-  let app = openApp(t); app.click('#start-vocabulary'); app.main();
+  let app = openApp(t); app.startArea('vocabulary'); app.main();
   const seen = [];
   for (let guard=0; app.current().task.kind !== 'practice' && guard<10; guard++) {
     const item=app.current(); seen.push(item.task.id);
@@ -250,7 +252,7 @@ test('vocabulary finishes exactly five quizzes before unchanged saved writing an
 });
 
 test('five wrong vocabulary choices survive reload and open the original writing form without extra questions', t => {
-  let app=openApp(t); app.click('#start-vocabulary'); app.main();
+  let app=openApp(t); app.startArea('vocabulary'); app.main();
   for (let i=0;i<5;i++) {
     assert.equal(app.current().task.id,'salt-vocabulary-original-'+(i+1));
     assert.match(app.get('.activity-header .muted').textContent,new RegExp(`활용 문제 · ${i+1} / 5문항`));
@@ -271,7 +273,7 @@ test('five wrong vocabulary choices survive reload and open the original writing
 });
 
 test('unsubmitted vocabulary choice survives home and reload, with next navigation gated', t => {
-  const app = openApp(t); app.click('#start-vocabulary'); app.main(); // Today's word cards precede the existing questions.
+  const app = openApp(t); app.startArea('vocabulary'); app.main(); // Today's word cards precede the existing questions.
   assert.equal(app.get('#activity-main').disabled, true, 'must answer before checking');
   const answer = app.current().task.answer;
   app.click(`#activity-option-${answer}`);
@@ -338,7 +340,7 @@ test('speed reading closes at 60 seconds and automatic reading resumes its sente
 });
 
 test('reading omits paragraph ordering, structure and relation maps while keeping seven comprehension questions', t => {
-  const app = openApp(t); app.click('#start-reading');
+  const app = openApp(t); app.startArea('reading');
   const seen = finishArea(app);
   assert.equal(seen.filter(item => item.kind === 'read').length, 1);
   assert.equal(seen.filter(item => item.taskId === 'reading-order').length, 0);
@@ -350,7 +352,7 @@ test('reading omits paragraph ordering, structure and relation maps while keepin
 });
 
 test('passage two skips reading straight to diagnostic and restores the pending question', t => {
-  const app = openApp(t); app.click('#start-reading'); app.advance(2000);
+  const app = openApp(t); app.startArea('reading'); app.advance(2000);
   const entry = app.current().entry;
   app.click('#activity-skip-read');
   assert.equal(app.current().task.id, 'reading-key');
@@ -383,7 +385,7 @@ test('an unfinished prior relation map resumes at comprehension and preserves re
 });
 
 test('each of the seven comprehension quizzes exposes the whole passage and restores choices with the panel folded', t => {
-  const app = openApp(t); app.click('#start-reading'); app.main();
+  const app = openApp(t); app.startArea('reading'); app.main();
   while (!app.current().task.id.startsWith('reading-content-')) submitCurrent(app);
   const paragraphs = app.catalog().reading.tasks[0].paragraphs.map(p => p.s.join(' '));
   for (let index = 1; index <= 7; index++) {
@@ -415,7 +417,7 @@ test('each of the seven comprehension quizzes exposes the whole passage and rest
 });
 
 test('comprehension keeps the same passage and its scroll and mobile fold state while moving between questions', t => {
-  const app = openApp(t); app.click('#start-reading'); app.main();
+  const app = openApp(t); app.startArea('reading'); app.main();
   while (!app.current().task.comprehensionType) submitCurrent(app);
   app.window.innerWidth = 375;
   const reference = app.get('#reading-reference'), passage = app.get('.reading-reference-text');
@@ -432,7 +434,7 @@ test('comprehension keeps the same passage and its scroll and mobile fold state 
 });
 
 test('seven-question comprehension restores question five and reports fact and inference scores with wrong-only review', t => {
-  let app = openApp(t); app.click('#start-reading'); app.main();
+  let app = openApp(t); app.startArea('reading'); app.main();
   while (!app.current().task.comprehensionType) submitCurrent(app);
   for (let i = 0; i < 4; i++) submitCurrent(app);
   const saved = app.session(); app.click('#activity-home');
@@ -492,7 +494,7 @@ test('old reading sessions skip removed structure activities and completed recor
 });
 
 test('passage two follows read -> diagnostic -> seven questions -> structure and writing with locked previous answers', t => {
-  const app = openApp(t); app.click('#start-reading'); app.advance(2000);
+  const app = openApp(t); app.startArea('reading'); app.advance(2000);
   assert.equal(app.get('#activity-main').textContent, '다 읽었어요 · 정밀검사'); app.main();
   assert.equal(app.current().task.id, 'reading-key');
   assert.equal(app.get('#activity-title').textContent, '정밀검사');
@@ -525,12 +527,12 @@ test('an unfinished previous seven-question order screen resumes at comprehensio
   assert.deepEqual(Object.values(restored.session().read), Object.values(old.read));
   assert.ok(restored.session().taskIds.every(id => !['reading-order', 'reading-structure', 'reading-relations'].includes(id)));
   assert.equal(restored.document.querySelector('.reading-order-slots'), null);
-  assert.doesNotMatch(restored.get('.training-card[data-area="reading"]').textContent, /문단 탭 순서|구조 파악|관계 연결/);
+  assert.doesNotMatch(restored.get('.course-stage-list [data-area="reading"]').textContent, /문단 탭 순서|구조 파악|관계 연결/);
 });
 
 test('new area clock pauses on home and menu, and never charges time to the saved legacy lesson', t => {
   const app = openApp(t); const original = app.legacy();
-  app.click('#start-vocabulary'); if (app.document.querySelector('.vocabulary-study')) app.main(); app.advance(3000);
+  app.startArea('vocabulary'); if (app.document.querySelector('.vocabulary-study')) app.main(); app.advance(3000);
   const beforeMenu = app.session().elapsedMs; assert.equal(beforeMenu, 3000);
   app.click('#menu-button'); app.advance(5000); assert.equal(app.session().elapsedMs, beforeMenu);
   app.click('#menu-close'); app.advance(2000); assert.equal(app.session().elapsedMs, beforeMenu + 2000);
@@ -544,22 +546,22 @@ test('full course draft and new area draft coexist across home navigation and re
   const app = openApp(t); app.click('#menu-button'); app.click('#menu-legacy');
   app.input('#comp0', '기존 학습에서 소금이 굳었어요.'); app.click('#vq2_3');
   const legacy = app.legacy(); app.click('#learning-home');
-  app.click('#start-vocabulary'); app.main(); app.click('#activity-option-0'); const area = app.session();
+  app.startArea('vocabulary'); app.main(); app.click('#activity-option-0'); const area = app.session();
   assert.deepEqual(app.legacy().draft, legacy.draft);
   app.click('#activity-home');
   const restored = openApp(t, app.snapshot()); restored.click('#menu-button'); restored.click('#menu-legacy');
   visible(restored, '#s1'); hidden(restored, '#activity-panel');
   assert.equal(restored.legacy().id, legacy.id); assert.equal(restored.get('#comp0').value, legacy.draft.compose[0]);
   assert.equal(restored.get('#vq2_3').checked, true);
-  restored.click('#learning-home'); restored.click('#start-vocabulary');
+  restored.click('#learning-home'); restored.startArea('vocabulary');
   assert.equal(restored.session().id, area.id); assert.deepEqual(restored.session().answers, area.answers);
   assert.equal(restored.get('#activity-option-0').checked, true);
 });
 
 test('historical area result and unified history leave an unfinished area untouched and menu continue restores it', t => {
-  const app = openApp(t); app.click('#start-reading'); finishArea(app);
+  const app = openApp(t); app.startArea('reading'); finishArea(app);
   const recordId = app.session().id;
-  app.click('#activity-home'); app.click('#start-vocabulary'); app.main(); app.click('#activity-option-2');
+  app.click('#activity-home'); app.startArea('vocabulary'); app.main(); app.click('#activity-option-2');
   app.advance(3000); app.click('#activity-home'); const current = app.session();
   app.click('#recent-list .record-card button'); visible(app, '#activity-result');
   assert.equal(app.document.querySelectorAll('#activity-review details').length, 9);
@@ -574,7 +576,7 @@ test('historical area result and unified history leave an unfinished area untouc
 });
 
 test('wrong-only retry and repeat area create distinct results without altering the completed source record', t => {
-  const app = openApp(t); app.click('#start-reading'); finishArea(app, 'reading-content-1');
+  const app = openApp(t); app.startArea('reading'); finishArea(app, 'reading-content-1');
   const source = app.records()[0]; assert.equal(app.results().wrong, 1);
   app.click('#activity-retry-wrong');
   assert.equal(app.session().reviewOf, source.id);
@@ -589,17 +591,17 @@ test('wrong-only retry and repeat area create distinct results without altering 
 });
 
 test('switching unfinished areas can be cancelled without losing answers and confirmed replacement keeps records', t => {
-  const app = openApp(t); app.click('#start-vocabulary'); app.main(); app.click('#activity-option-3');
-  app.click('#activity-home'); const original = app.session(); app.click('#start-reading');
+  const app = openApp(t); app.startArea('vocabulary'); app.main(); app.click('#activity-option-3');
+  app.click('#activity-home'); const original = app.session(); app.startArea('reading');
   assert.equal(app.get('#confirm-dialog').open, true); assert.equal(app.session().id, original.id);
   app.click('#confirm-no'); assert.deepEqual(app.session(), original);
-  app.click('#start-reading'); app.click('#confirm-yes');
+  app.startArea('reading'); app.click('#confirm-yes');
   assert.equal(app.session().area, 'readingDiagnosticV3'); assert.notEqual(app.session().id, original.id);
   assert.equal(app.records().length, 0); visible(app, '#activity-panel');
 });
 
 test('failed completion persistence retains the result and prevents retry replacement until saving works', t => {
-  const app = openApp(t); app.click('#start-reading');
+  const app = openApp(t); app.startArea('reading');
   app.blockWrites(['areaTrainingSession.v1', 'areaTrainingHistory.v1']);
   finishArea(app); const completed = app.session();
   assert.equal(app.records().length, 0); visible(app, '#activity-storage-warning');
@@ -632,7 +634,7 @@ test('reading recall keeps partial drafts and explicit confidence, locks submiss
 });
 
 test('diagnostic selects a core sentence per paragraph and the later outline classifies roles in one passage', t => {
-  let app = openApp(t); app.click('#start-reading'); app.main();
+  let app = openApp(t); app.startArea('reading'); app.main();
   assert.equal(app.current().task.id, 'reading-key');
   assert.equal(app.document.querySelectorAll('.reading-key-passage').length, 1);
   assert.equal(app.document.querySelectorAll('.reading-role-sentence').length, 17);
@@ -667,7 +669,7 @@ test('diagnostic selects a core sentence per paragraph and the later outline cla
 });
 
 test('diagnostic marks unselected answers blue, correct selections green and incorrect selections red', t => {
-  const app = openApp(t); app.click('#start-reading'); app.main();
+  const app = openApp(t); app.startArea('reading'); app.main();
   [1, 3, 10, 14].forEach(id => app.click('#reading-key-' + id)); app.main();
   assert.match(app.get('.reading-key-guide').textContent, /핵심 문장 1\/4 정답/);
   assert.equal(app.get('#reading-key-0').classList.contains('key-answer'), true);
@@ -681,7 +683,7 @@ test('diagnostic marks unselected answers blue, correct selections green and inc
 });
 
 test('summary preserves escaped writing and the reference passage, enforces original 40-character minimum and stays ungraded', t => {
-  const app = openApp(t); app.click('#start-reading'); app.main();
+  const app = openApp(t); app.startArea('reading'); app.main();
   while (app.current().task.kind !== 'summary') { if (app.current().task.kind === 'read') app.main(); else submitCurrent(app); }
   app.input('#reading-summary-answer', '짧은 요약'); assert.equal(app.get('#activity-main').disabled, true);
   const text = '<img src=x onerror=alert(1)> 우리가 먹는 소금은 바다와 땅속에서 얻으며, 소금은 맛을 내고 음식을 보관하는 데 사용한다.';
@@ -711,7 +713,7 @@ test('an existing diagnostic draft reloads in the unified passage without resett
 });
 
 test('reading trace follows observed paragraphs and backward movement, survives reload and excludes idle pointer time', t => {
-  let app = openApp(t); app.click('#start-reading');
+  let app = openApp(t); app.startArea('reading');
   const paragraphEvent = (index, type) => app.get(`p[data-reading-paragraph="${index}"]`).dispatchEvent(new app.window.Event(type));
   app.advance(1000);
   paragraphEvent(0, 'pointermove'); app.advance(1000);

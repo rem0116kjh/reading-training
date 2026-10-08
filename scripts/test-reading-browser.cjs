@@ -96,8 +96,9 @@ async function open(browser, viewport, name) {
   page.on('console', message => { if (message.type() === 'error' && !message.location().url.endsWith('/favicon.ico')) evidence.consoleErrors.push({ name, error: message.text(), location: message.location() }); });
   page.on('requestfailed', request => evidence.failedRequests.push({ name, url: request.url(), error: request.failure().errorText }));
   page.on('response', response => { if (response.status() >= 400 && !response.url().endsWith('/favicon.ico')) evidence.failedRequests.push({ name, url: response.url(), status: response.status() }); });
-  await page.goto(BASE); await page.locator('#start-reading').waitFor();
-  await page.locator('#start-reading').click();
+  await page.goto(BASE); await page.locator('#home-full-start').waitFor();
+  // Reading-only QA sets up its fixture through the retained area API.
+  await page.evaluate(() => AreaTraining.startReading());
   await page.locator('.activity-passage').waitFor();
   // Finish the real reading activity rather than using its skip control.
   await page.locator('.activity-passage p').last().scrollIntoViewIfNeeded();

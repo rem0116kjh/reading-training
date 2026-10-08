@@ -39,6 +39,7 @@ function openApp(t, stored = {}) {
   const input = (selector, value) => { const node = get(selector); assert.equal(node.disabled, false); assert.equal(node.closest('[hidden]'), null); node.value = value; node.dispatchEvent(new window.Event(node.tagName === 'SELECT' ? 'change' : 'input', { bubbles: true })); };
   return {
     window, document, get, click, input,
+    startLegacyArea: steps => vm.runInContext(`replaceSession({ mode: 'area', requiredSteps: ${JSON.stringify(steps)} });`, context),
     main: () => click('#btn-main'),
     textButton(text, root = '#report') {
       const button = [...get(root).querySelectorAll('button')].find(node => node.textContent.trim() === text);
@@ -103,28 +104,29 @@ test('fresh adapter opens home with zero real stats and starts the existing full
   assert.equal(app.get('#btn-main').textContent, '채점하기');
 });
 
-test('three home cards enter existing required-stage mappings without fabricated completion', t => {
-  for (const [area, steps, first] of [['fluency', [3], 3], ['vocabulary', [1], 1], ['reading', [2, 3, 4], 2]]) {
-    const app = openApp(t); app.click(`#start-${area}`);
-    view(app, 'learning'); visible(app, `#s${first}`);
-    assert.equal(app.session().mode, 'area'); assert.deepEqual(app.session().requiredSteps, steps);
-    assert.equal(app.session().currentStep, first);
-    assert.equal(app.get('#overall-progress').value, 0);
-    assert.equal(app.history().length, 0);
-  }
+test('home has one training entry and lists the three stages in sequence', t => {
+  const app = openApp(t);
+  assert.equal(app.document.querySelectorAll('.course-start-card').length, 1);
+  assert.equal(app.document.querySelectorAll('.training-card, #start-fluency, #start-vocabulary, #start-reading, #home-first-start').length, 0);
+  assert.deepEqual([...app.document.querySelectorAll('.course-stage-list h3')].map(node => node.textContent), ['어휘력', '지문 1', '지문 2']);
+  assert.equal(app.get('#home-full-start').textContent.trim(), '맞춤형 훈련 시작 →');
+  app.click('#home-full-start');
+  assert.equal(app.session().mode, 'full');
+  assert.deepEqual(app.session().requiredSteps, [1, 2, 3, 4]);
+  assert.equal(app.history().length, 0);
 });
 
-test('home back and reload preserve draft; full start and matching card resume the same session', t => {
+test('home back and reload preserve draft; unified course entry resumes the same session', t => {
   const app = openApp(t); app.click('#home-full-start');
   app.input('#comp0', '소금이 굳은 채로 남아 있어요.'); app.click('#vq2_3'); const id = app.session().id;
   app.click('#learning-home'); view(app, 'home'); visible(app, '#home-resume');
-  assert.match(app.get('#start-vocabulary').textContent, /이어하기/);
+  assert.match(app.get('#home-full-start').textContent, /이어하기/);
   app.click('#home-full-start'); assert.equal(app.session().id, id);
   assert.equal(app.get('#vq2_3').checked, true);
   app.click('#learning-home');
   const restored = openApp(t, app.snapshot()); view(restored, 'home'); visible(restored, '#home-resume');
   assert.equal(restored.get('#resume-dialog').open, false);
-  restored.click('#start-vocabulary'); view(restored, 'learning');
+  restored.click('#home-full-start'); view(restored, 'learning');
   assert.equal(restored.session().id, id);
   assert.equal(restored.get('#comp0').value, '소금이 굳은 채로 남아 있어요.');
   assert.equal(restored.get('#vq2_3').checked, true);
@@ -135,7 +137,7 @@ test('home back and reload preserve draft; full start and matching card resume t
 test('home and open drawer pause learning time while actual learning continues counting', t => {
   const app = openApp(t);
   assert.equal(app.active(), false); app.advance(4000); assert.equal(app.session().elapsedMs, 0);
-  app.click('#start-fluency'); assert.equal(app.active(), true); app.advance(3000);
+  app.startLegacyArea([3]); assert.equal(app.active(), true); app.advance(3000);
   assert.equal(app.session().elapsedMs, 3000); assert.equal(app.session().metrics.readingMs, 3000);
   app.click('#menu-button'); assert.equal(app.active(), false); app.advance(4000);
   assert.equal(app.session().elapsedMs, 3000);
@@ -145,15 +147,15 @@ test('home and open drawer pause learning time while actual learning continues c
   assert.equal(app.session().elapsedMs, 5000); assert.equal(app.session().metrics.readingMs, 5000);
 });
 
-test('changing unfinished area confirms replacement and cancellation retains the original answers', t => {
-  const app = openApp(t); app.click('#start-vocabulary'); app.input('#comp0', '소금이 굳었어요.');
-  const original = app.session(); app.click('#learning-home'); app.click('#start-reading');
+test('starting the full course from an unfinished legacy area confirms replacement and cancellation retains the original answers', t => {
+  const app = openApp(t); app.startLegacyArea([1]); app.input('#comp0', '소금이 굳었어요.');
+  const original = app.session(); app.click('#learning-home'); app.click('#home-full-start');
   assert.equal(app.get('#confirm-dialog').open, true); assert.equal(app.session().id, original.id);
   app.click('#confirm-no'); view(app, 'home'); assert.deepEqual(app.session().draft, original.draft);
   app.click('#home-continue'); assert.equal(app.get('#comp0').value, '소금이 굳었어요.');
-  app.click('#learning-home'); app.click('#start-reading'); app.click('#confirm-yes');
-  view(app, 'learning'); visible(app, '#s2');
-  assert.notEqual(app.session().id, original.id); assert.deepEqual(app.session().requiredSteps, [2, 3, 4]);
+  app.click('#learning-home'); app.click('#home-full-start'); app.click('#confirm-yes');
+  view(app, 'learning'); visible(app, '#s1');
+  assert.notEqual(app.session().id, original.id); assert.deepEqual(app.session().requiredSteps, [1, 2, 3, 4]);
   assert.equal(app.history().length, 0);
 });
 
@@ -166,15 +168,15 @@ test('today completion uses Seoul date, actual mapped stages and excludes wrong-
   const wrongOnly = completedRecord('today-mistakes', [], todayEarly, 60000, 'mistakes');
   const app = openApp(t, { trainingHistory: JSON.stringify([vocab, fluency, oldReading, wrongOnly]) });
   assert.equal(app.get('#today-progress').value, 2);
-  assert.equal(app.get('#card-reading-status').textContent, '진행 전');
+  assert.equal(app.get('#today-checklist [data-area="reading"] small').textContent, '진행 전');
   const concept = completedRecord('today-concept', [2], todayEarly);
   const missingWriting = openApp(t, { trainingHistory: JSON.stringify([vocab, fluency, concept, wrongOnly]) });
   assert.equal(missingWriting.get('#today-progress').value, 2);
   const writing = completedRecord('today-writing', [4], todayEarly);
   const complete = openApp(t, { trainingHistory: JSON.stringify([vocab, fluency, concept, writing, wrongOnly]) });
   assert.equal(complete.get('#today-progress').value, 3);
-  assert.match(complete.get('#card-reading-status').textContent, /오늘 완료/);
-  assert.match(complete.get('#today-message').textContent, /세 영역을 모두 완료/);
+  assert.match(complete.get('#today-checklist [data-area="reading"] small').textContent, /완료/);
+  assert.match(complete.get('#today-message').textContent, /세 단계를 모두 완료/);
   const onlyMistakes = openApp(t, { trainingHistory: JSON.stringify([wrongOnly]) });
   assert.equal(onlyMistakes.get('#today-progress').value, 0);
 });
@@ -194,7 +196,7 @@ test('home time deduplicates completed current session and recent list shows onl
 test('home historical report hides active stage and never overwrites a current unfinished lesson', t => {
   const record = completedRecord('past-record', [1, 2, 3, 4], '2026-10-07T16:00:00.000Z', 60000, 'full');
   const app = openApp(t, { trainingHistory: JSON.stringify([record]) });
-  app.click('#start-vocabulary'); app.input('#comp0', '현재 회차의 굳은 소금 문장'); const current = app.session();
+  app.startLegacyArea([1]); app.input('#comp0', '현재 회차의 굳은 소금 문장'); const current = app.session();
   app.click('#learning-home'); app.click('#recent-list .record-card button');
   view(app, 'report'); visible(app, '#s5'); assert.equal(app.get('#s1').hidden, true);
   assert.equal(app.get('#mistake-panel').hidden, true);
@@ -210,7 +212,7 @@ test('home historical report hides active stage and never overwrites a current u
 test('drawer continue from historical report restores active timing and persists subsequent edits', t => {
   const record = completedRecord('history-return', [1], '2026-10-07T16:00:00.000Z');
   const app = openApp(t, { trainingHistory: JSON.stringify([record]) });
-  app.click('#start-vocabulary'); app.input('#comp0', '과거 결과를 보기 전의 굳은 소금 문장');
+  app.startLegacyArea([1]); app.input('#comp0', '과거 결과를 보기 전의 굳은 소금 문장');
   app.advance(1000); const current = app.session();
   app.click('#learning-home'); app.click('#recent-list .record-card button');
   view(app, 'report'); assert.equal(app.active(), false);
@@ -260,7 +262,7 @@ test('drawer keyboard focus wraps over visible controls and current-page state f
   assert.equal(app.get('[data-menu="history"]').getAttribute('aria-current'), 'page');
   assert.equal(app.get('[data-menu="home"]').hasAttribute('aria-current'), false);
   assert.equal(app.document.querySelectorAll('[data-menu][aria-current="page"]').length, 1);
-  app.click('[data-menu="home"]'); app.click('#start-vocabulary'); app.input('#comp0', '굳은 소금'); app.click('#menu-button');
+  app.click('[data-menu="home"]'); app.startLegacyArea([1]); app.input('#comp0', '굳은 소금'); app.click('#menu-button');
   assert.equal(app.get('#menu-continue').getAttribute('aria-current'), 'page');
   assert.equal(app.document.querySelectorAll('[data-menu][aria-current="page"]').length, 1);
   assert.equal(app.get('#rail button[data-s="1"]').getAttribute('aria-current'), 'step');
@@ -301,7 +303,7 @@ test('native outline placement buttons survive rerenders and completed outline c
 });
 
 test('adapter full lesson reaches decorated report, history, home completion and a new review', t => {
-  const app = openApp(t); app.click('#home-first-start'); finishFull(app);
+  const app = openApp(t); app.click('#home-full-start'); finishFull(app);
   view(app, 'report'); visible(app, '#s5');
   assert.equal(app.session().status, 'completed'); assert.equal(app.history().length, 1);
   assert.match(app.get('.report-hero').textContent, /26\/26/);

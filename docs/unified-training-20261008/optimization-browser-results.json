@@ -1,0 +1,127 @@
+{
+  "base": "http://127.0.0.1:4183/",
+  "layouts": [
+    {
+      "name": "source",
+      "width": 320,
+      "overflow": false,
+      "cards": [
+        {
+          "x": 14,
+          "y": 589.5625,
+          "width": 292,
+          "height": 563.859375,
+          "font": "\"Noto Sans KR\", -apple-system, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif"
+        }
+      ]
+    },
+    {
+      "name": "built",
+      "width": 320,
+      "overflow": false,
+      "cards": [
+        {
+          "x": 14,
+          "y": 589.5625,
+          "width": 292,
+          "height": 563.859375,
+          "font": "\"Noto Sans KR\", -apple-system, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif"
+        }
+      ]
+    },
+    {
+      "name": "source",
+      "width": 768,
+      "overflow": false,
+      "cards": [
+        {
+          "x": 32,
+          "y": 447.578125,
+          "width": 704,
+          "height": 400.375,
+          "font": "\"Noto Sans KR\", -apple-system, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif"
+        }
+      ]
+    },
+    {
+      "name": "built",
+      "width": 768,
+      "overflow": false,
+      "cards": [
+        {
+          "x": 32,
+          "y": 447.578125,
+          "width": 704,
+          "height": 400.375,
+          "font": "\"Noto Sans KR\", -apple-system, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif"
+        }
+      ]
+    },
+    {
+      "name": "source",
+      "width": 1440,
+      "overflow": false,
+      "cards": [
+        {
+          "x": 176,
+          "y": 460.171875,
+          "width": 1088,
+          "height": 378.28125,
+          "font": "\"Noto Sans KR\", -apple-system, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif"
+        }
+      ]
+    },
+    {
+      "name": "built",
+      "width": 1440,
+      "overflow": false,
+      "cards": [
+        {
+          "x": 176,
+          "y": 460.171875,
+          "width": 1088,
+          "height": 378.28125,
+          "font": "\"Noto Sans KR\", -apple-system, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif"
+        }
+      ]
+    }
+  ],
+  "journeys": [
+    {
+      "name": "source",
+      "fluencyScore": 100,
+      "fullCourseScore": 100,
+      "questions": 19,
+      "stages": [
+        "vocabulary",
+        "fluency",
+        "reading"
+      ],
+      "reloadedEachStage": true,
+      "keyboardResume": true,
+      "draftReloaded": true,
+      "menuPaused": true,
+      "completedRecords": 2
+    },
+    {
+      "name": "built",
+      "fluencyScore": 100,
+      "fullCourseScore": 100,
+      "questions": 19,
+      "stages": [
+        "vocabulary",
+        "fluency",
+        "reading"
+      ],
+      "reloadedEachStage": true,
+      "keyboardResume": true,
+      "draftReloaded": true,
+      "menuPaused": true,
+      "completedRecords": 2
+    }
+  ],
+  "errors": [],
+  "requestFailures": [],
+  "browser": "154.0.8037.98",
+  "passed": true
+}

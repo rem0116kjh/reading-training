@@ -39,6 +39,7 @@
   const areaOf = s => catalog[s.area].trainingArea || s.area;
   const currentArea = s => engine.current(s)?.task.trainingArea || areaOf(s);
   const areaLabels = { vocabulary: '어휘력', fluency: '읽기 유창성', reading: '독해력' };
+  const courseLabels = { vocabulary: '1단계 · 어휘력', fluency: '2단계 · 지문 1', reading: '3단계 · 지문 2' };
   const active = () => session?.status === 'active';
   const visible = () => active() && app.dataset.view === 'activity' && !document.hidden && !$('menu-drawer').open && !$('confirm-dialog').open;
   const showWarning = message => {
@@ -156,8 +157,8 @@
     const p = document.createElement('progress'); p.id = 'activity-progress'; p.max = 100; p.setAttribute('aria-label', '영역 학습 진행률');
     header.append(p, el('p', 'tiny', '<span id="activity-progress-label"></span> · <span id="activity-save"></span>'));
     if (catalog[session.area].integrated) {
-      const steps = el('ol', 'course-steps'); steps.setAttribute('aria-label', '전체 학습 순서');
-      Object.entries(areaLabels).forEach(([area, label]) => {
+      const steps = el('ol', 'course-steps'); steps.setAttribute('aria-label', '맞춤형 훈련 순서');
+      Object.entries(courseLabels).forEach(([area, label]) => {
         const item = el('li', area === currentArea(session) ? 'current' : '', esc(label));
         if (area === currentArea(session)) item.setAttribute('aria-current', 'step');
         steps.append(item);
@@ -202,7 +203,7 @@
     } else {
       const submitted = session.submitted[entry.key];
       const nextTask = nextVisibleTask();
-      const nextLabel = task.diagnostic && nextTask?.comprehensionType ? '이해도 테스트 시작' : task.comprehensionType && nextTask?.selectionType === 'outline' ? '구조화·글쓰기 시작' : task.selectionType === 'outline' && nextTask?.kind === 'summary' ? '글쓰기 시작' : nextTask?.stage ? `Stage ${nextTask.stage} 시작` : nextTask?.trainingArea && nextTask.trainingArea !== task.trainingArea ? `${areaLabels[nextTask.trainingArea]} 시작` : '다음 문제';
+      const nextLabel = task.diagnostic && nextTask?.comprehensionType ? '이해도 테스트 시작' : task.comprehensionType && nextTask?.selectionType === 'outline' ? '구조화·글쓰기 시작' : task.selectionType === 'outline' && nextTask?.kind === 'summary' ? '글쓰기 시작' : nextTask?.trainingArea && nextTask.trainingArea !== task.trainingArea ? `${catalog[session.area].integrated ? courseLabels[nextTask.trainingArea] : areaLabels[nextTask.trainingArea]} 시작` : nextTask?.stage ? `Stage ${nextTask.stage} 시작` : '다음 문제';
       const main = button('activity-main', submitted ? session.cursor === session.queue.length - 1 ? '결과 보기' : nextLabel : task.kind === 'practice' ? '연습 저장' : task.kind === 'summary' ? '요약 저장·피드백 확인' : '정답 확인', submitted ? advance : submit);
       main.disabled = !submitted && !engine.canSubmit(session);
       actions.append(main);
@@ -940,6 +941,7 @@
     currentArea: () => session ? currentArea(session) : null,
     getCurrent: () => engine.current(session),
     isCurrentCourse: () => session?.area === latestAreas.course,
+    isCourse: () => !!session && !!catalog[session.area].integrated && !session.reviewOf,
     hasPreviousFlow: () => !!session && !!((catalog[session.area].trainingArea === 'reading' && session.area !== latestAreas.reading) || catalog[session.area].legacyFlow || catalog[session.area].legacyTiming || catalog[session.area].legacyContent || (window.FluencyConceptContent && (catalog[session.area].fluencyVersion === 'concept-v1' || session.area === fluencyAreas.fluency || session.area === readingAreas.course))),
     label: s => catalog[s.area].label,
     areaOf,
