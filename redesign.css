@@ -261,15 +261,22 @@ dialog .session-actions > .btn { flex: 1 1 140px; }
 .resume-copy p { color: var(--text-secondary); font-size: 14px; }
 #home-resume-progress { height: 6px; width: min(100%, 380px); margin-top: 14px; --accent: var(--color-brand-600); }
 .resume-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; flex-shrink: 0; }
-.training-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; margin: 0 0 40px; }
-.training-card { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 0; min-height: 250px; padding: 24px; background: var(--area-soft); color: var(--text-primary); border: 1px solid transparent; box-shadow: none; border-radius: var(--card-radius); }
+.training-grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); grid-template-rows: minmax(min-content, 1.15fr) minmax(min-content, 1fr); grid-template-areas: "fluency reading" "vocabulary reading"; gap: 20px; margin: 0 0 40px; }
+.training-card { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 0; min-width: 0; min-height: 250px; padding: 24px; background: var(--area-soft); color: var(--text-primary); border: 1px solid transparent; box-shadow: none; border-radius: var(--card-radius); }
+.training-card[data-area="fluency"] { grid-area: fluency; }
+.training-card[data-area="vocabulary"] { grid-area: vocabulary; }
+.training-card[data-area="reading"] { grid-area: reading; }
 .training-card h2, .training-card h3 { font-size: 22px; font-weight: 700; line-height: 1.45; color: var(--text-primary); }
-.training-card-meta { display: flex; width: 100%; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 6px; min-height: 24px; margin: 0 0 12px; font-size: 13px; }
+.training-card-meta { display: flex; width: 100%; align-items: center; justify-content: flex-start; flex-wrap: wrap; gap: 6px; min-height: 24px; margin: 0 0 12px; font-size: 13px; }
 .training-card-meta > span:last-child, .training-card-meta > b { padding: 4px 9px; font-size: 11px; font-weight: 500; border-radius: var(--radius-pill); background: var(--background-surface); color: var(--area-action); white-space: nowrap; }
-.training-card-description { color: var(--text-secondary); font-size: 15px; line-height: 1.7; max-width: 35ch; margin-top: 10px; margin-bottom: 18px; }
+.training-card-description { color: var(--text-secondary); font-size: 15px; line-height: 1.7; max-width: 26ch; margin-top: 10px; margin-bottom: 18px; }
 .training-card-button { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 52px; padding: 14px 18px; margin-top: 0; border: 0; border-radius: var(--radius-medium); background: var(--color-white); color: var(--action-primary); font-size: 16px; font-weight: 700; text-align: left; text-decoration: none; }
 .training-card-button svg { width: 20px; height: 20px; }
 .training-card-footer { width: 100%; display: block; margin-top: auto; padding-bottom: 16px; color: var(--text-secondary); font-size: 12px; line-height: 1.7; }
+.training-card-steps { display: grid; gap: 20px; padding: 24px 0 36px; margin: auto 0; list-style: none; counter-reset: reading-step; }
+.training-card-steps li { display: flex; align-items: baseline; gap: 12px; color: var(--text-secondary); font-size: 15px; line-height: 1.6; counter-increment: reading-step; }
+.training-card-steps li::before { content: counter(reading-step, decimal-leading-zero); flex-shrink: 0; color: var(--area-action); font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.training-card[data-area="reading"] .training-card-footer { margin-top: 0; }
 .home-section-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0 0 20px; }
 .home-section-head h2 { font-size: 23px; }
 .home-section-head > p { color: var(--text-muted); font-size: 13px; }
@@ -453,10 +460,10 @@ button.sent { min-height: 48px; padding: 2px 5px; max-width: 100%; border-radius
 
 @media (min-width: 640px) {
   body { --page-gutter: 32px; }
-  .training-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
-  .training-card[data-area="reading"] { grid-column: 1 / -1; }
-  .training-card { min-height: 270px; }
-  .training-card[data-area="reading"] .training-card-description { max-width: 60ch; }
+  .training-grid { gap: 20px; }
+  .training-card { min-height: 240px; }
+  .training-card[data-area="reading"] { padding: 28px; }
+  .training-card[data-area="reading"] h2 { font-size: 28px; }
   .slots { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .slot { padding: 16px; }
   .slot .item { flex-direction: column; align-items: flex-start; }
@@ -471,10 +478,13 @@ button.sent { min-height: 48px; padding: 2px 5px; max-width: 100%; border-radius
   body { --page-gutter: 36px; }
   .site-header { min-height: 88px; }
   #home-panel { padding-top: 20px; }
-  .training-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .training-card[data-area="reading"] { grid-column: auto; }
-  .training-card { padding: 24px; min-height: 290px; }
-  .training-card-description { min-height: 54px; }
+  .training-grid { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 24px; }
+  .training-card { padding: 28px; }
+  .training-card[data-area="reading"] { padding: 36px; }
+  .training-card[data-area="reading"] h2 { font-size: 32px; }
+  .training-card[data-area="reading"] .training-card-description { font-size: 17px; }
+  .training-card-steps { gap: 24px; }
+  .training-card-steps li { font-size: 17px; }
   .today-card { padding: 26px 28px; }
   .areas { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .areas .card { padding: 20px; }
@@ -504,9 +514,17 @@ button.sent { min-height: 48px; padding: 2px 5px; max-width: 100%; border-radius
   .resume-card { flex-direction: column; align-items: stretch; padding: 20px; gap: 16px; }
   .resume-actions { width: 100%; }
   .resume-actions .btn { flex: 1 1 100px; }
-  .training-grid { margin-top: 0; margin-bottom: 32px; gap: 16px; }
-  .training-card { padding: 22px; min-height: 250px; }
-  .training-card-description { margin-bottom: 18px; }
+  .training-grid { grid-template-columns: minmax(0, 44fr) minmax(0, 56fr); margin-bottom: 32px; gap: 12px; }
+  .training-card { padding: 16px; min-height: 230px; border-radius: 18px; }
+  .training-card h2, .training-card h3 { font-size: 21px; }
+  .training-card-meta { margin-bottom: 10px; }
+  .training-card-meta > span:last-child, .training-card-meta > b { padding-inline: 7px; }
+  .training-card-description { font-size: 14px; line-height: 1.6; margin-top: 8px; margin-bottom: 16px; }
+  .training-card-footer { font-size: 11px; padding-bottom: 12px; }
+  .training-card-button { min-height: 48px; padding: 12px 8px; font-size: 14px; line-height: 1.5; justify-content: center; text-align: center; }
+  .training-card-button > span[aria-hidden] { display: none; }
+  .training-card-steps { gap: 20px; padding: 24px 0; }
+  .training-card-steps li { gap: 8px; font-size: 13px; }
   .home-section-head { gap: 8px; }
   .home-section-head:has(> p) { flex-direction: column; align-items: flex-start; gap: 6px; }
   .home-section-head h2 { font-size: 22px; }
@@ -551,8 +569,10 @@ button.sent { min-height: 48px; padding: 2px 5px; max-width: 100%; border-radius
 
 @media (max-width: 359px) {
   body { --page-gutter: 14px; }
-  .training-card, .card, .today-card { padding: 18px; }
-  .training-card h2, .training-card h3 { font-size: 24px; }
+  .card, .today-card { padding: 18px; }
+  .training-grid { grid-template-columns: minmax(0, 47fr) minmax(0, 53fr); gap: 10px; }
+  .training-card { padding: 12px; }
+  .training-card h2, .training-card h3 { font-size: 20px; }
   .rail button { font-size: 10px; }
   .actionbar .btn { padding-inline: 11px; }
   #btn-main { min-width: 100px; }
